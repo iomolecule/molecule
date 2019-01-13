@@ -1,0 +1,4 @@
+{
+  "error-no-function-to-invoke-specified" : "No function to be invoke has been specified",
+  "error-no-valid-function-registered-for-uri" : "No function with URI ${function-to-invoke} seems to be registered in the system"
+}
