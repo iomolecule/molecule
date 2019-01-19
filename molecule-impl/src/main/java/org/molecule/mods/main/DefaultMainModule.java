@@ -5,6 +5,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.multibindings.ProvidesIntoSet;
@@ -12,18 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.cfg4j.source.ConfigurationSource;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
-import org.molecule.system.LifecycleManager;
-import org.molecule.system.OnExit;
-import org.molecule.system.OnStartup;
-import org.molecule.system.annotations.AsyncEventBus;
-import org.molecule.system.annotations.EventSink;
-import org.molecule.system.annotations.MainArgs;
-import org.molecule.system.annotations.SyncEventBus;
+import org.molecule.system.*;
+import org.molecule.system.annotations.*;
+import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -71,6 +69,13 @@ public class DefaultMainModule extends AbstractModule{
         bindEventSinks();
 
         bindStartupAndExitInstances();
+
+        bindDomainOperations();
+    }
+
+    private void bindDomainOperations() {
+        Multibinder<List<Operation>> domainOperations = Multibinder.newSetBinder(binder(),new TypeLiteral<List<Operation>>(){},
+                DomainOperations.class);
     }
 
     private void bindStartupAndExitInstances() {
@@ -166,6 +171,13 @@ public class DefaultMainModule extends AbstractModule{
                                                                           @MainArgs Optional<String[]> mainArgs){
 
         return new SysLifecycleCallbackServiceImpl(startups,exits,mainArgs);
+    }
+
+    @Provides
+    @Singleton
+    public DomainService provideDomain(@DomainOperations Set<List<Operation>> operationsSet){
+        log.info("OperationsSet {}",operationsSet);
+        return new DefaultDomainService(operationsSet);
     }
 
 }

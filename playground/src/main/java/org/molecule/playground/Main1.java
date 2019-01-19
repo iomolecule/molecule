@@ -9,17 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.molecule.mods.main.SysBuilder;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
-import org.molecule.system.LifecycleException;
-import org.molecule.system.OnExit;
-import org.molecule.system.OnStartup;
-import org.molecule.system.Sys;
+import org.molecule.system.*;
+import org.molecule.system.annotations.DomainOperations;
 import org.molecule.system.annotations.EventSink;
 
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Set;
 
 import static org.molecule.util.CollectionUtils.KV;
+import static org.molecule.util.CollectionUtils.LIST;
 import static org.molecule.util.CollectionUtils.MAP;
 
 public class Main1 {
@@ -45,7 +45,9 @@ public class Main1 {
                 .withAttributes(new ModuleInfo("test","1.0","test-vendor",MAP(KV("att1","something"))))
                 .withLifecycleManager(SimpleLifecycleManager.class)
                 .withOnStartup(StartupMain.class)
-                .withModules(new SomeNewModule(),
+                .withModules(
+                        new TestModule(),
+                        new SomeNewModule(),
                         new SomeOtherNewModule(new ModuleInfo("one","1.3.4","x",MAP())),
                         new SomeOtherNewModule(new ModuleInfo("two","1.3.4","x",MAP())),
                         new SomeOtherNewModule(new ModuleInfo("three","1.3.4","x",MAP())))
@@ -148,6 +150,14 @@ class SomeNewModule extends AbstractModule {
         return new AnotherEventSink();
     }
 
+    @ProvidesIntoSet
+    @DomainOperations
+    public List<Operation> provideDomaiOperations(){
+        return LIST(Operation.class,
+                new SimpleOperation("domain2.testOperation2","function://simple/testFun2"),
+                new SimpleOperation("domain2.subdomain1.testOperation3","function://simple/testFun3")
+        );
+    }
 }
 
 
@@ -169,5 +179,14 @@ class SomeOtherNewModule extends AbstractModule{
     @EventSink
     public Object provideEventSink(){
         return new SomeNewEventSink(moduleInfo.getName());
+    }
+
+    @ProvidesIntoSet
+    @DomainOperations
+    public List<Operation> provideDomaiOperations(){
+        return LIST(Operation.class,
+                new SimpleOperation("domain3.testOperation2","function://simple/testFun2"),
+                new SimpleOperation("domain3.subdomain1.testOperation3","function://simple/testFun3")
+        );
     }
 }

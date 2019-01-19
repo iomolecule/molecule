@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.molecule.system.LifecycleException;
 import org.molecule.system.LifecycleManager;
 import org.molecule.system.annotations.SyncEventBus;
+import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
@@ -18,17 +19,19 @@ public class SimpleLifecycleManager implements LifecycleManager{
     private EventBus eventBus;
     private EventsService eventSinkRegistrationService;
     private SysLifecycleCallbackService sysLifecycleCallbackService;
+    private DomainService domainService;
     boolean started;
 
     @Inject
     public SimpleLifecycleManager(@SyncEventBus EventBus eventBus,
                                   EventsService eventSinkRegistrationService,
-    SysLifecycleCallbackService sysLifecycleCallbackService){
+    SysLifecycleCallbackService sysLifecycleCallbackService,DomainService domainService){
         checkArgument(eventBus != null,"EventBus cannot be null!");
         checkArgument(eventSinkRegistrationService != null,"EventSinkRegistration Service cannot be null!");
         this.eventBus = eventBus;
         this.eventSinkRegistrationService = eventSinkRegistrationService;
         this.sysLifecycleCallbackService = sysLifecycleCallbackService;
+        this.domainService = domainService;
     }
 
 
@@ -44,6 +47,11 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
             eventSinkRegistrationService.registerEventSinks();
         }
+
+        log.info("Starting domain service...");
+        domainService.start();
+
+        log.info("Registered Domains..");
 
         log.info("Starting lifecycle of services...");
 
