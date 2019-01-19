@@ -131,6 +131,12 @@
                 <artifactId>commons-text</artifactId>
                 <version>1.6</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.github.berkesa</groupId>
+                <artifactId>datatree-core</artifactId>
+                <version>1.0.9</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>

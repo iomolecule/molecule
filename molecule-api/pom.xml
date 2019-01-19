@@ -20,6 +20,10 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.berkesa</groupId>
+            <artifactId>datatree-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
