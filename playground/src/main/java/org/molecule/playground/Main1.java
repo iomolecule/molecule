@@ -100,43 +100,22 @@ class SomeNewEventSink{
 class StartupMain implements OnStartup {
 
     Set<ModuleInfo> modules;
-
-    private static class Options{
-
-        @CommandLine.Option(names={"-p","--profiles"},description = "Specify the active profiles")
-        List<String> profiles = Arrays.asList("default");
-
-        @CommandLine.Option(names={"-f","--configFile"},description="Specify the config File")
-        File configFile = new File("conf.json");
-
-        @CommandLine.Option(names={"-i","--interactive"},description="Starts the interactive shell")
-        boolean interactivShell = false;
-
-        @Override
-        public String toString() {
-            return "Options{" +
-                    "profiles=" + profiles +
-                    ", configFile=" + configFile +
-                    ", interactivShell=" + interactivShell +
-                    '}';
-        }
-    }
+    Shell shell;
 
     @Inject
-    StartupMain(@ModulesInfo Set<ModuleInfo> moduleInfoSet){
+    StartupMain(@ModulesInfo Set<ModuleInfo> moduleInfoSet,CommandLineShell shell)
+    {
         this.modules = moduleInfoSet;
+        this.shell = shell;
     }
 
     @Override
     public void onStart(String[] args){
 
-        Options options = CommandLine.populateCommand(new Options(), args);
 
-        log.info("{}",options);
+        shell.start(args);
 
-
-
-        log.info("Starting up System with argumenst ");
+        /*log.info("Starting up System with argumenst ");
         if(args != null && args.length > 0){
             for (String arg : args) {
                 log.info(arg);
@@ -151,7 +130,7 @@ class StartupMain implements OnStartup {
                 log.info("Module {}",module.getName());
             }
 
-        }
+        }*/
     }
 }
 
