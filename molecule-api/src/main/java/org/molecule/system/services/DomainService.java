@@ -16,6 +16,10 @@ public interface DomainService {
 
     public Operation getOperation(String path);
 
+    public List<String> getDomainNamesAt(String path);
+
+    public List<String> getOperationsAt(String path);
+
     public void stop();
 
     public void print(PrintStream stream);

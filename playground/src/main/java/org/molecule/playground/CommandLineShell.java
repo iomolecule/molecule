@@ -6,6 +6,7 @@ import org.molecule.system.Shell;
 import org.molecule.system.services.DomainService;
 import picocli.CommandLine;
 
+import javax.inject.Inject;
 import java.util.List;
 
 
@@ -26,6 +27,7 @@ public class CommandLineShell implements Shell{
 
     private DomainService domainService;
 
+    @Inject
     public CommandLineShell(DomainService domainService){
         this.domainService = domainService;
     }

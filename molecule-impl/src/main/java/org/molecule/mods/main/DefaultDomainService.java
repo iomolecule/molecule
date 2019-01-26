@@ -88,8 +88,46 @@ class DefaultDomainService implements DomainService {
     }
 
     @Override
+    public List<String> getDomainNamesAt(String path) {
+
+        List<String> domainNames = new ArrayList<>();
+        if(domainTree.isExists(path)){
+
+            Tree tree = domainTree.get(path);
+
+            tree.forEach(subtree->{
+                Object obj = subtree.asObject();
+
+                if(!(obj instanceof Operation)){
+                    domainNames.add(subtree.getName());
+                }
+            });
+        }
+        return domainNames;
+    }
+
+    @Override
+    public List<String> getOperationsAt(String path) {
+        List<String> operationNames = new ArrayList<>();
+        if(domainTree.isExists(path)){
+
+            Tree tree = domainTree.get(path);
+
+            tree.forEach(subtree->{
+                Object obj = subtree.asObject();
+
+                if(obj instanceof Operation){
+                    operationNames.add(subtree.getName());
+                }
+            });
+        }
+        return operationNames;
+    }
+
+    @Override
     public void stop() {
         if(domainTree != null){
+
             domainTree.clear();
             domainTree = null;
             started = false;

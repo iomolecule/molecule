@@ -4,12 +4,14 @@ import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
 import org.molecule.system.LifecycleException;
 import org.molecule.system.LifecycleManager;
+import org.molecule.system.Shell;
 import org.molecule.system.annotations.SyncEventBus;
 import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -20,18 +22,21 @@ public class SimpleLifecycleManager implements LifecycleManager{
     private EventsService eventSinkRegistrationService;
     private SysLifecycleCallbackService sysLifecycleCallbackService;
     private DomainService domainService;
+    private Shell interactiveShell;
     boolean started;
 
     @Inject
     public SimpleLifecycleManager(@SyncEventBus EventBus eventBus,
                                   EventsService eventSinkRegistrationService,
-    SysLifecycleCallbackService sysLifecycleCallbackService,DomainService domainService){
+                                  SysLifecycleCallbackService sysLifecycleCallbackService, DomainService domainService,
+                                  @Named("shell://interactive/default") Shell interactiveShell){
         checkArgument(eventBus != null,"EventBus cannot be null!");
         checkArgument(eventSinkRegistrationService != null,"EventSinkRegistration Service cannot be null!");
         this.eventBus = eventBus;
         this.eventSinkRegistrationService = eventSinkRegistrationService;
         this.sysLifecycleCallbackService = sysLifecycleCallbackService;
         this.domainService = domainService;
+        this.interactiveShell = interactiveShell;
     }
 
 
@@ -68,6 +73,12 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
         started = true;
 
+        log.info("Starting Interactive Shell...");
+
+        interactiveShell.start(new String[0]);
+
+        log.info("Done starting interactive Shell...");
+
     }
 
     @Override
@@ -78,6 +89,8 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
 
             eventBus.post("STOPPING_SYS");
+
+            interactiveShell.stop();
 
             if (eventSinkRegistrationService.hasAnyEventSinks()) {
                 for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {

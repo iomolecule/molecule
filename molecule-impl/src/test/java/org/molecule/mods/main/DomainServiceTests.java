@@ -60,7 +60,29 @@ public class DomainServiceTests {
         domainService.start();
 
         boolean validOperation = domainService.isValidOperation("common.usermanagement.addUsers");
+
         assertTrue(!validOperation);
+        domainService.stop();
+    }
+
+    @Test
+    public void testDomainOperations() throws URISyntaxException {
+        List<Operation> operations = getOperations();
+
+        DomainService domainService = new DefaultDomainService(operations);
+        domainService.start();
+
+        //boolean validOperation = domainService.isValidOperation("common.usermanagement.addUsers");
+
+        List<String> domainNamesAt = domainService.getDomainNamesAt("common.admin");
+
+        System.out.println(domainNamesAt);
+
+        List<String> operationsAt = domainService.getOperationsAt("common.admin");
+
+        System.out.println(operationsAt);
+
+        //assertTrue(!validOperation);
         domainService.stop();
     }
 
@@ -70,6 +92,9 @@ public class DomainServiceTests {
                 new SimpleOperation("commercial.account.remove",
                         new URI("function://removeAccountsFun")),
                 new SimpleOperation("common.usermanagement.addUser",new URI("function://addUserFun")),
+                new SimpleOperation("common.admin.addUser",new URI("function://addUserFun")),
+                new SimpleOperation("common.admin.addUsers",new URI("function://addUsersFun")),
+                new SimpleOperation("common.admin.newAdmin.removeUser",new URI("function://removeUserFun")),
                 new SimpleOperation("commercial.services.crm.viewCustomers",new URI("function://viewCRMUsers"))
         );
     }

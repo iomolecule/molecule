@@ -6,6 +6,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.molecule.mods.ishell.DefaultInteractiveShellModule;
 import org.molecule.mods.main.SysBuilder;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
@@ -50,11 +51,17 @@ public class Main1 {
                 .withOnStartup(StartupMain.class)
                 .withModules(
                         new TestModule(),
+                        new DefaultInteractiveShellModule(),
                         new SomeNewModule(),
                         new SomeOtherNewModule(new ModuleInfo("one","1.3.4","x",MAP())),
                         new SomeOtherNewModule(new ModuleInfo("two","1.3.4","x",MAP())),
                         new SomeOtherNewModule(new ModuleInfo("three","1.3.4","x",MAP())))
                 .build();
+
+
+       /* Sys compositeSystem = new SysBuilder(args)
+                .withAttributes(new ModuleInfo("simple","1.0","test-vendor",MAP(KV("att1","something"))))
+                .build();*/
 
         compositeSystem.start();
 

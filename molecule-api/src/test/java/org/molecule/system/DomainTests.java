@@ -30,8 +30,22 @@ public class DomainTests {
 
         dataTree.putMap("domain1.subdomain1");
         dataTree.putList("domain1.subdomain1.list1");
+        dataTree.putMap("domain1.subdomain1.subdomain2.subdomain3");
+        dataTree.putMap("domain1.subdomain3.subdomain4");
+        dataTree.putList("domain1.list3");
 
 
-        System.out.println(dataTree);
+        Tree domain1 = dataTree.get("domain1");
+
+        //System.out.println(dataTree);
+
+
+
+        //System.out.println(domain1);
+
+        domain1.forEach(tree -> {
+            System.out.println(tree.getName());
+            System.out.println(tree);
+        });
     }
 }
