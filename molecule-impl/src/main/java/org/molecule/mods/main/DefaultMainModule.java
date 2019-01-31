@@ -10,7 +10,9 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.extern.slf4j.Slf4j;
-import org.cfg4j.source.ConfigurationSource;
+import org.molecule.config.CompositeConfigurationSource;
+import org.molecule.config.ConfigurationSource;
+import org.molecule.config.annotations.ConfigsSource;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
 import org.molecule.system.*;
@@ -72,6 +74,22 @@ public class DefaultMainModule extends AbstractModule{
         bindStartupAndExitInstances();
 
         bindDomainOperations();
+
+        bindConfigsSources();
+
+        bindFuns();
+    }
+
+    private void bindFuns() {
+        Multibinder<Fn> configsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<Fn>(){},
+                Fun.class);
+
+    }
+
+    private void bindConfigsSources() {
+        Multibinder<ConfigurationSource> configsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                ConfigsSource.class);
+
     }
 
     private void bindDomainOperations() {
@@ -182,6 +200,17 @@ public class DefaultMainModule extends AbstractModule{
         return new DefaultDomainService(operationsSet);
     }
 
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@AsyncEventBus EventBus eventBus)
+    @Provides
+    @Singleton
+    public ConfigurationSource provideCompositeConfigSource(@ConfigsSource Set<ConfigurationSource> configurationSources){
+        return new CompositeConfigurationSource(configurationSources);
+    }
+
+    @Provides
+    @Singleton
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns, @AsyncEventBus EventBus eventBus,
+                                     ConfigurationSource configurationSource){
+        return new DefaultFnBus(fns,eventBus,configurationSource);
+    }
 
 }

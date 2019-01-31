@@ -121,12 +121,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.cfg4j</groupId>
-                <artifactId>cfg4j-core</artifactId>
-                <version>${cfg4j.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
                 <version>1.6</version>

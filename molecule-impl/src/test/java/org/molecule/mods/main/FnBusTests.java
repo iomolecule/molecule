@@ -2,9 +2,10 @@ package org.molecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
-import org.cfg4j.provider.ConfigurationProvider;
 import org.junit.Test;
 import org.molecule.commons.Constants;
+import org.molecule.config.ConfigurationSource;
+import org.molecule.config.InputStreamConfigurationSource;
 import org.molecule.system.Fn;
 import org.molecule.system.InOutParam;
 import org.molecule.system.LifecycleException;
@@ -15,8 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 
-import static org.molecule.config.ConfigUtil.newClasspathConfigSource;
-import static org.molecule.config.ConfigUtil.newConfigurationProvider;
 import static org.molecule.util.CollectionUtils.SET;
 
 @Slf4j
@@ -140,8 +139,9 @@ public class FnBusTests {
     }
 
 
-    private ConfigurationProvider getMessageConfigProvider(){
-        return newConfigurationProvider("",newClasspathConfigSource("test","fn-bus-test.json"));
+    private ConfigurationSource getMessageConfigProvider(){
+        return new InputStreamConfigurationSource(false,false,
+                getClass().getResourceAsStream("/test/fn-bus-test.json"));
     }
 }
 

@@ -1,7 +1,7 @@
 package org.molecule.mods.main;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cfg4j.source.ConfigurationSource;
+import org.molecule.config.ConfigurationSource;
 import org.molecule.system.ExceptionHandler;
 
 @Slf4j

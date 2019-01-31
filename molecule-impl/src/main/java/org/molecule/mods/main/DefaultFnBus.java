@@ -1,9 +1,7 @@
 package org.molecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
-import org.apache.commons.text.StringSubstitutor;
-import org.cfg4j.provider.ConfigurationProvider;
-import org.molecule.system.ExceptionHandler;
+import org.molecule.config.ConfigurationSource;
 import org.molecule.system.Fn;
 import org.molecule.system.LifecycleException;
 import org.molecule.system.Param;
@@ -31,11 +29,11 @@ class DefaultFnBus implements FnBus{
 
     private boolean started;
 
-    private ConfigurationProvider messageConfigProvider;
+    private ConfigurationSource messageConfigProvider;
 
     DefaultFnBus(Set<Fn> fnSet,
                  EventBus eventBus,
-                 ConfigurationProvider messageConfigProvider){
+                 ConfigurationSource messageConfigProvider){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -100,7 +98,7 @@ class DefaultFnBus implements FnBus{
     private Param handleError(String errorCode, Param param) {
         Param outParam = param.plus(STATUS,FAILED);
         outParam = outParam.plus(REASON,
-                format(messageConfigProvider.getProperty(errorCode,String.class),outParam.asMap()));
+                format(messageConfigProvider.get(errorCode,String.class,errorCode),outParam.asMap()));
         return outParam;
     }
 
@@ -120,7 +118,7 @@ class DefaultFnBus implements FnBus{
     private Param handleException(Exception exception, Param param) {
         String message = exception.getMessage();
         try{
-            message = messageConfigProvider.getProperty(message,String.class);
+            message = messageConfigProvider.get(message,String.class,message);
         }catch(Exception ex){
             //if no mapped message is found just ignore and send the message in the exception
         }

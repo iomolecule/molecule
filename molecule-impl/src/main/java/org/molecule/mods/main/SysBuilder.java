@@ -3,7 +3,7 @@ package org.molecule.mods.main;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import org.cfg4j.source.ConfigurationSource;
+import org.molecule.config.ConfigurationSource;
 import org.molecule.module.ModuleInfo;
 import org.molecule.system.LifecycleManager;
 import org.molecule.system.OnExit;

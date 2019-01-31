@@ -1,17 +1,17 @@
 package org.molecule.mods.main;
 
-import org.cfg4j.source.ConfigurationSource;
 import org.junit.Test;
+import org.molecule.config.ConfigurationSource;
+import org.molecule.config.InputStreamConfigurationSource;
 import org.molecule.system.ExceptionHandler;
-
-import static org.molecule.config.ConfigUtil.newClasspathConfigSource;
 
 public class ExceptionHandlerTests {
 
     @Test
     public void testSimpleExceptions(){
 
-        ConfigurationSource source = newClasspathConfigSource("test","exception-config.json");
+        ConfigurationSource source = new InputStreamConfigurationSource(false,false,
+                getClass().getResourceAsStream(""));
         ExceptionHandler exceptionHandler = new DefaultExceptionHandler(source);
 
         int x = 0;
