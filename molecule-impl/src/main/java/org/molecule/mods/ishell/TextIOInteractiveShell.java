@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
+import org.molecule.system.Operation;
 import org.molecule.system.Shell;
 import org.molecule.system.services.DomainService;
+import org.molecule.system.services.FnBus;
+import org.mvel2.MVEL;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -22,14 +26,20 @@ class TextIOInteractiveShell implements Shell{
     private String currentDomain = "";
 
     private Stack<String> domainStack = new Stack<>();
+    //private EvictingQueue<String> commandHistory = EvictingQueue.create(50);
 
     private Pattern pattern = Pattern.compile(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+    //private Pattern pattern = Pattern.compile(" (?=(?:[^\"]*\\[(.\\s\\d)*\\])*[^\"]*$)");
+    //private Pattern pattern = Pattern.compile(" (?=(?:[^\"]*\\[[^\"]*\\])*[^\"]*$)");
+    //private Pattern pattern = Pattern.compile(" ");
     private Splitter splitter = Splitter.on(pattern).trimResults().omitEmptyStrings();
+    private FnBus fnBus;
 
 
     @Inject
-    TextIOInteractiveShell(DomainService domainService){
+    TextIOInteractiveShell(DomainService domainService, FnBus fnBus){
         this.domainService = domainService;
+        this.fnBus = fnBus;
     }
 
     @Override
@@ -39,6 +49,7 @@ class TextIOInteractiveShell implements Shell{
         String commandName = "";
         while(!hasToExit(commandName) ){
             //textIO.newStringInputReader().
+
             commandName = textIO.newStringInputReader().read(getPrompt(domainStack,currentDomain,defaultPrompt));
 
             executeCommand(commandName);
@@ -77,12 +88,69 @@ class TextIOInteractiveShell implements Shell{
             changeDomain(textTerminal,args);
         }else if(commandName.equalsIgnoreCase("pwd")){
             printCurrentDomain(textTerminal,args);
+        }else if(commandName.equalsIgnoreCase("exec")){
+            executeOperation(textTerminal,args);
         }else if(hasToExit(commandName)){
             exit(textTerminal,args);
         }else{
             textTerminal.printf("Unknown Command %s",commandName);
             textTerminal.resetLine();
         }
+    }
+
+    private void executeOperation(TextTerminal<?> textTerminal, List<String> args) {
+        if(args == null || args.isEmpty()){
+            return;
+        }
+        String operationName = args.get(0);
+        String operationParams = null;
+        if(args.size() > 1){
+            operationParams = args.get(1);
+        }
+
+        log.info("Operation {}",operationName);
+        log.info("Params {}",operationParams);
+
+        String fullyQualifiedDomainName = getFullyQualifiedDomain(domainStack,currentDomain);
+
+        if(!domainService.isValidOperationAt(fullyQualifiedDomainName,operationName)){
+            textTerminal.printf("No such operation '%s' found under '%s'",operationName,getPrompt(domainStack,currentDomain,""));
+        }else{
+            if(operationParams != null) {
+                //log.info("PREQUOTE IN {}", operationParams);
+                //String opParams = quoteParams(operationParams);
+                String opParams = unQuoteParams(operationParams);
+                //log.info("MVEL IN {}", opParams);
+
+                Object expressionObj = MVEL.eval(opParams);
+                textTerminal.printf("Params %s, %s", expressionObj.getClass(), expressionObj);
+                Operation operation = domainService.getOperationAt(fullyQualifiedDomainName,operationName);
+                URI functionURI = operation.getFunctionURI();
+                textTerminal.printf("About to invoke function %s",functionURI);
+            }
+        }
+        //textTerminal.printf("Operation Name %s, Args %s",operationName,operationParams);
+
+        textTerminal.resetLine();
+    }
+
+    private String unQuoteParams(String operationParams) {
+        if(operationParams.startsWith("\"") && operationParams.endsWith("\"")){
+            operationParams = operationParams.substring(1,operationParams.length()-1);
+        }
+        return operationParams;
+    }
+
+    private String quoteParams(String operationParams) {
+        StringBuffer paramBuffer = new StringBuffer();
+
+        paramBuffer.append("\"");
+
+        paramBuffer.append(operationParams);
+
+        paramBuffer.append("\"");
+
+        return paramBuffer.toString();
     }
 
     private void exit(TextTerminal<?> textTerminal, List<String> args) {
@@ -164,7 +232,7 @@ class TextIOInteractiveShell implements Shell{
 
     private void listOps(TextTerminal textTerminal, List<String> args) {
         String fullyQualifiedDomain = getFullyQualifiedDomain(domainStack, currentDomain);
-        log.info("FCN {}",fullyQualifiedDomain);
+        //log.info("FCN {}",fullyQualifiedDomain);
         List<String> operationsAt = domainService.getOperationsAt(fullyQualifiedDomain);
         textTerminal.printf("%s",operationsAt);
         textTerminal.resetLine();
@@ -172,7 +240,7 @@ class TextIOInteractiveShell implements Shell{
 
     private void listDomains(TextTerminal<?> textTerminal, List<String> args) {
         String fullyQualifiedDomain = getFullyQualifiedDomain(domainStack, currentDomain);
-        log.info("FCN {}",fullyQualifiedDomain);
+        //log.info("FCN {}",fullyQualifiedDomain);
         List<String> domainNamesAt = domainService.getDomainNamesAt(fullyQualifiedDomain);
         textTerminal.printf("%s",domainNamesAt);
         textTerminal.resetLine();

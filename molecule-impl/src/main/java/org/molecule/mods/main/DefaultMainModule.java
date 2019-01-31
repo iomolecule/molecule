@@ -17,6 +17,7 @@ import org.molecule.system.*;
 import org.molecule.system.annotations.*;
 import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
+import org.molecule.system.services.FnBus;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Named;
@@ -129,6 +130,7 @@ public class DefaultMainModule extends AbstractModule{
         }
     }
 
+
     @Provides
     @SyncEventBus
     @Singleton
@@ -179,5 +181,7 @@ public class DefaultMainModule extends AbstractModule{
         log.info("OperationsSet {}",operationsSet);
         return new DefaultDomainService(operationsSet);
     }
+
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@AsyncEventBus EventBus eventBus)
 
 }

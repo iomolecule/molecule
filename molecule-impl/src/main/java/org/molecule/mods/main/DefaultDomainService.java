@@ -155,4 +155,15 @@ class DefaultDomainService implements DomainService {
 
         return operations;
     }
+
+    @Override
+    public boolean isValidOperationAt(String path,String operationName) {
+        List<String> operationsAt = getOperationsAt(path);
+        return operationsAt.contains(operationName);
+    }
+
+    @Override
+    public Operation getOperationAt(String fullyQualifiedDomainName, String operationName) {
+        return getOperation(String.format("%s.%s",fullyQualifiedDomainName,operationName));
+    }
 }
