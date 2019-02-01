@@ -1,30 +1,23 @@
 package org.molecule.playground;
 
 import com.google.common.eventbus.Subscribe;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.molecule.mods.ishell.DefaultInteractiveShellModule;
+import org.molecule.mods.ishell.JLineInteractiveShellModule;
 import org.molecule.mods.main.SysBuilder;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
 import org.molecule.system.*;
 import org.molecule.system.annotations.DomainOperations;
 import org.molecule.system.annotations.EventSink;
-import picocli.CommandLine;
-
 
 import javax.inject.Inject;
-import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static org.molecule.util.CollectionUtils.KV;
-import static org.molecule.util.CollectionUtils.LIST;
-import static org.molecule.util.CollectionUtils.MAP;
+import static org.molecule.util.CollectionUtils.*;
 
 public class Main1 {
 
@@ -51,7 +44,7 @@ public class Main1 {
                 .withOnStartup(StartupMain.class)
                 .withModules(
                         new TestModule(),
-                        new DefaultInteractiveShellModule(),
+                        new JLineInteractiveShellModule(),
                         new SomeNewModule(),
                         new SomeOtherNewModule(new ModuleInfo("one","1.3.4","x",MAP())),
                         new SomeOtherNewModule(new ModuleInfo("two","1.3.4","x",MAP())),
@@ -171,8 +164,8 @@ class SomeNewModule extends AbstractModule {
     @DomainOperations
     public List<Operation> provideDomaiOperations(){
         return LIST(Operation.class,
-                new SimpleOperation("domain2.testOperation2","function://simple/testFun2"),
-                new SimpleOperation("domain2.subdomain1.testOperation3","function://simple/testFun3")
+                new SimpleOperation("domain2.testOperation2","function://simple/testFun2",""),
+                new SimpleOperation("domain2.subdomain1.testOperation3","function://simple/testFun3","")
         );
     }
 }
@@ -202,8 +195,8 @@ class SomeOtherNewModule extends AbstractModule{
     @DomainOperations
     public List<Operation> provideDomaiOperations(){
         return LIST(Operation.class,
-                new SimpleOperation("domain3.testOperation2","function://simple/testFun2"),
-                new SimpleOperation("domain3.subdomain1.testOperation3","function://simple/testFun3")
+                new SimpleOperation("domain3.testOperation2","function://simple/testFun2",""),
+                new SimpleOperation("domain3.subdomain1.testOperation3","function://simple/testFun3","")
         );
     }
 }

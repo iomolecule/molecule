@@ -29,4 +29,8 @@ public interface DomainService {
     public boolean isValidOperationAt(String path,String operationName);
 
     public Operation getOperationAt(String fullyQualifiedDomainName, String operationName);
+
+    public List<Operation> getAllOperationsAt(String fullyQualifiedDomainName);
+
+    public boolean isValidDomainAt(String path,String domain);
 }

@@ -2,10 +2,9 @@ package org.molecule.system;
 
 import com.github.krukow.clj_ds.PersistentMap;
 import com.github.krukow.clj_lang.PersistentHashMap;
+import org.molecule.commons.Constants;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InOutParam implements Param {
 
@@ -82,6 +81,11 @@ public class InOutParam implements Param {
     @Override
     public Map<String,Object> asMap() {
         return delegate;
+    }
+
+    @Override
+    public List<ParamDeclaration> outParams() {
+        return (List<ParamDeclaration>)delegate.getOrDefault(Constants.OUT_PARAMS, Collections.EMPTY_LIST);
     }
 
     @Override

@@ -88,14 +88,14 @@ public class DomainServiceTests {
 
     private List<Operation> getOperations() throws URISyntaxException {
         return LIST(Operation.class,new SimpleOperation("commercial.accounts.view",
-                new URI("function://viewAccountsFun")),
+                new URI("function://viewAccountsFun"),""),
                 new SimpleOperation("commercial.account.remove",
-                        new URI("function://removeAccountsFun")),
-                new SimpleOperation("common.usermanagement.addUser",new URI("function://addUserFun")),
-                new SimpleOperation("common.admin.addUser",new URI("function://addUserFun")),
-                new SimpleOperation("common.admin.addUsers",new URI("function://addUsersFun")),
-                new SimpleOperation("common.admin.newAdmin.removeUser",new URI("function://removeUserFun")),
-                new SimpleOperation("commercial.services.crm.viewCustomers",new URI("function://viewCRMUsers"))
+                        new URI("function://removeAccountsFun"),""),
+                new SimpleOperation("common.usermanagement.addUser",new URI("function://addUserFun"),""),
+                new SimpleOperation("common.admin.addUser",new URI("function://addUserFun"),""),
+                new SimpleOperation("common.admin.addUsers",new URI("function://addUsersFun"),""),
+                new SimpleOperation("common.admin.newAdmin.removeUser",new URI("function://removeUserFun"),""),
+                new SimpleOperation("commercial.services.crm.viewCustomers",new URI("function://viewCRMUsers"),"")
         );
     }
 }

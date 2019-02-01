@@ -8,4 +8,6 @@ public interface Operation {
 
     public URI getFunctionURI();
 
+    public String getDoc();
+
 }

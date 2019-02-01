@@ -8,6 +8,7 @@ import org.molecule.system.Shell;
 import org.molecule.system.annotations.SyncEventBus;
 import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
+import org.molecule.system.services.FnBus;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Inject;
@@ -23,13 +24,14 @@ public class SimpleLifecycleManager implements LifecycleManager{
     private SysLifecycleCallbackService sysLifecycleCallbackService;
     private DomainService domainService;
     private Shell interactiveShell;
+    private FnBus fnBus;
     boolean started;
 
     @Inject
     public SimpleLifecycleManager(@SyncEventBus EventBus eventBus,
                                   EventsService eventSinkRegistrationService,
                                   SysLifecycleCallbackService sysLifecycleCallbackService, DomainService domainService,
-                                  @Named("shell://interactive/default") Shell interactiveShell){
+                                  @Named("shell://interactive/jline") Shell interactiveShell,FnBus fnBus){
         checkArgument(eventBus != null,"EventBus cannot be null!");
         checkArgument(eventSinkRegistrationService != null,"EventSinkRegistration Service cannot be null!");
         this.eventBus = eventBus;
@@ -37,6 +39,7 @@ public class SimpleLifecycleManager implements LifecycleManager{
         this.sysLifecycleCallbackService = sysLifecycleCallbackService;
         this.domainService = domainService;
         this.interactiveShell = interactiveShell;
+        this.fnBus = fnBus;
     }
 
 
@@ -52,6 +55,8 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
             eventSinkRegistrationService.registerEventSinks();
         }
+
+        fnBus.start();
 
         log.info("Starting domain service...");
         domainService.start();
@@ -101,6 +106,7 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
             sysLifecycleCallbackService.invokeAllExitCallbacks();
 
+            fnBus.stop();
             log.info("Sys Stop completed...");
             started = false;
         }

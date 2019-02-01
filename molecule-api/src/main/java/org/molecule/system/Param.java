@@ -2,6 +2,7 @@ package org.molecule.system;
 
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,4 +31,6 @@ public interface Param {
     public Set<Map.Entry<String, Object>> entrySet();
 
     public Map<String,Object> asMap();
+
+    public List<ParamDeclaration> outParams();
 }

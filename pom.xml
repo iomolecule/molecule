@@ -133,14 +133,20 @@
             </dependency>
 
             <dependency>
-                <groupId>org.beryx</groupId>
-                <artifactId>text-io</artifactId>
-                <version>3.3.0</version>
-            </dependency>
-            <dependency>
                 <groupId>org.mvel</groupId>
                 <artifactId>mvel2</artifactId>
                 <version>2.4.3.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>3.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fusesource.jansi</groupId>
+                <artifactId>jansi</artifactId>
+                <version>1.17.1</version>
             </dependency>
         </dependencies>
 

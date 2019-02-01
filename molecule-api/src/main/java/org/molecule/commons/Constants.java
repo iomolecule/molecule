@@ -11,6 +11,8 @@ public final class Constants {
     public static final String FAILED = "failed";
     public static final String REASON = "reason";
     public static final String EXCEPTION = "exception";
+    public static final String OUT_PARAMS = "function-out-params";
+    public static final String IN_PARAMS = "function-in-params";
 
     /** Error Codes **/
     public static final String ERROR_NO_FUNCTION_TO_INVOKE_SPECIFIED = "error-no-function-to-invoke-specified";

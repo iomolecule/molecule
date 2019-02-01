@@ -1,0 +1,60 @@
+package org.molecule.mods.ishell;
+
+import org.molecule.system.Param;
+import org.molecule.system.services.DomainService;
+
+import java.util.List;
+import java.util.Stack;
+import java.util.function.Function;
+
+import static org.molecule.commons.Constants.IN_PARAMS;
+
+class ChangeDomainFunction implements Function<Param, Param> {
+
+    private Stack<String> domainStack;
+    private DomainService domainService;
+
+    public ChangeDomainFunction(DomainService domainService, Stack<String> domainStack) {
+        this.domainStack = domainStack;
+        this.domainService = domainService;
+    }
+
+    @Override
+    public Param apply(Param param) {
+
+
+            if (param.containsKey(IN_PARAMS)) {
+                List<String> args = (List<String>) param.get(IN_PARAMS);
+
+                if (args == null || args.isEmpty()) {
+                    System.out.println("Please specify the destination domain (or '/' for root)");
+                }
+
+                String destinationDomain = args.get(0);
+
+                if (!destinationDomain.equalsIgnoreCase("/")) {
+
+                    String fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
+
+                    if (domainService.isValidDomainAt(fullyQualifiedDomain, destinationDomain)) {
+
+                        domainStack.push(destinationDomain);
+
+
+                        fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
+
+                    } else {
+                        System.out.println(String.format("Domain %s is not a valid domain under %s", destinationDomain, fullyQualifiedDomain));
+                    }
+                } else {
+                    domainStack.clear();
+                    domainStack.push(JLineInteractiveShell.ROOT_DOMAIN);
+                }
+
+            } else {
+                System.out.println("Please specify the destination domain (or '/' for root)");
+            }
+
+        return param;
+    }
+}

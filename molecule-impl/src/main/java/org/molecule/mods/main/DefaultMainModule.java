@@ -81,8 +81,11 @@ public class DefaultMainModule extends AbstractModule{
     }
 
     private void bindFuns() {
-        Multibinder<Fn> configsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<Fn>(){},
+        Multibinder<Fn> funs = Multibinder.newSetBinder(binder(),new TypeLiteral<Fn>(){},
                 Fun.class);
+
+        Multibinder<List<Fn>> funsList = Multibinder.newSetBinder(binder(),new TypeLiteral<List<Fn>>(){},
+                Funs.class);
 
     }
 
@@ -208,9 +211,12 @@ public class DefaultMainModule extends AbstractModule{
 
     @Provides
     @Singleton
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns, @AsyncEventBus EventBus eventBus,
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList, @AsyncEventBus EventBus eventBus,
                                      ConfigurationSource configurationSource){
-        return new DefaultFnBus(fns,eventBus,configurationSource);
+
+        return new DefaultFnBus(fns,fnsList,eventBus,configurationSource);
     }
+
+
 
 }

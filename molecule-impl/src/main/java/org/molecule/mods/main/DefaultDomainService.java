@@ -156,6 +156,7 @@ class DefaultDomainService implements DomainService {
         return operations;
     }
 
+
     @Override
     public boolean isValidOperationAt(String path,String operationName) {
         List<String> operationsAt = getOperationsAt(path);
@@ -165,5 +166,29 @@ class DefaultDomainService implements DomainService {
     @Override
     public Operation getOperationAt(String fullyQualifiedDomainName, String operationName) {
         return getOperation(String.format("%s.%s",fullyQualifiedDomainName,operationName));
+    }
+
+    @Override
+    public List<Operation> getAllOperationsAt(String fullyQualifiedDomainName) {
+        List<Operation> allOperations = new ArrayList<>();
+        if(domainTree.isExists(fullyQualifiedDomainName)){
+
+            Tree tree = domainTree.get(fullyQualifiedDomainName);
+
+            tree.forEach(subtree->{
+                Object obj = subtree.asObject();
+
+                if(obj instanceof Operation){
+                    allOperations.add((Operation)obj);
+                }
+            });
+        }
+        return allOperations;
+    }
+
+    @Override
+    public boolean isValidDomainAt(String path, String domain) {
+        List<String> domainNamesAt = getDomainNamesAt(path);
+        return domainNamesAt.contains(domain);
     }
 }

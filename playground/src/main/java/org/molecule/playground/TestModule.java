@@ -32,9 +32,8 @@ public class TestModule extends AbstractModule{
     @DomainOperations
     public List<Operation> provideDomaiOperations(){
         return LIST(Operation.class,
-                new SimpleOperation("testOperation1","function://simple/testFun"),
-                new SimpleOperation("domain.testOperation2","function://simple/testFun2"),
-                new SimpleOperation("domain.subdomain1.testOperation3","function://simple/testFun3")
+                new SimpleOperation("domain.testOperation2","function://simple/testFun2",""),
+                new SimpleOperation("domain.subdomain1.testOperation3","function://simple/testFun3","")
         );
     }
 

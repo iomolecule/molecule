@@ -1,14 +1,17 @@
 package org.molecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
+import lombok.extern.slf4j.Slf4j;
 import org.molecule.config.ConfigurationSource;
 import org.molecule.system.Fn;
 import org.molecule.system.LifecycleException;
 import org.molecule.system.Param;
+import org.molecule.system.ParamDeclaration;
 import org.molecule.system.services.FnBus;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -17,9 +20,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.molecule.commons.Constants.*;
 import static org.molecule.util.StringUtils.format;
 
+@Slf4j
 class DefaultFnBus implements FnBus{
 
     private Set<Fn> fns;
+    private Set<List<Fn>> fnsSets;
 
     private EventBus eventBus;
 
@@ -37,6 +42,24 @@ class DefaultFnBus implements FnBus{
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
+        this.eventBus = eventBus;
+        this.messageConfigProvider = messageConfigProvider;
+
+        try {
+            uri = new URI(String.format("%s://%s", FUNCTION_SCHEME, FNBUS_NAME));
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    DefaultFnBus(Set<Fn> fnSet,
+                 Set<List<Fn>> fnSets,
+                 EventBus eventBus,
+                 ConfigurationSource messageConfigProvider){
+        checkArgument(fnSet != null,"Set of Fns cannot be null!");
+        checkArgument(eventBus != null, "EventBus cannot be null!");
+        this.fns = fnSet;
+        this.fnsSets = fnSets;
         this.eventBus = eventBus;
         this.messageConfigProvider = messageConfigProvider;
 
@@ -77,7 +100,7 @@ class DefaultFnBus implements FnBus{
         if(!started){
            //do the stopping
             fnMap.clear();
-            fns.clear();
+            //fns.clear();
         }
     }
 
@@ -96,9 +119,14 @@ class DefaultFnBus implements FnBus{
     }
 
     private Param handleError(String errorCode, Param param) {
+        log.info("Error on Function Call {}",errorCode);
         Param outParam = param.plus(STATUS,FAILED);
-        outParam = outParam.plus(REASON,
-                format(messageConfigProvider.get(errorCode,String.class,errorCode),outParam.asMap()));
+        if(messageConfigProvider.isValid(errorCode)) {
+            outParam = outParam.plus(REASON,
+                    format(messageConfigProvider.get(errorCode, String.class, errorCode), outParam.asMap()));
+        }else{
+            outParam = outParam.plus(REASON,errorCode);
+        }
         return outParam;
     }
 
@@ -106,7 +134,10 @@ class DefaultFnBus implements FnBus{
         if(fnMap.containsKey(funURI)){
             Fn fnToInvoke = fnMap.get(funURI);
             try {
-                return fnToInvoke.apply(param);
+                Param outParam = fnToInvoke.apply(param);
+                //List<ParamDeclaration> outDeclarations = fnToInvoke.getOutDeclarations();
+                //outParam = outParam.plus(OUT_PARAMS,outDeclarations);
+                return outParam;
             }catch(Exception e){
                 return handleException(e,param);
             }
@@ -138,6 +169,16 @@ class DefaultFnBus implements FnBus{
             //initialize the internal function map here
             for (Fn fn : fns) {
                 fnMap.put(fn.getURI(),fn);
+            }
+
+            if(fnsSets != null && !fnsSets.isEmpty()){
+                for (List<Fn> fnsSet : fnsSets) {
+                    for (Fn fn : fnsSet) {
+                        fnMap.put(fn.getURI(),fn);
+                    }
+
+                }
+
             }
         }
     }
