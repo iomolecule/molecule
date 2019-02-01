@@ -34,6 +34,7 @@ class JLineInteractiveShell implements Shell{
 
     private DomainService domainService;
     static String defaultPrompt = "> ";
+    private Completer domainOpCompleter;
     //private String currentDomain = "";
 
 
@@ -54,6 +55,7 @@ class JLineInteractiveShell implements Shell{
         this.fnBus = fnBus;
         this.domainStack = domainStack;
         this.domainStack.push(ROOT_DOMAIN);
+        this.domainOpCompleter = new DomainOperationsCompleter(domainService,domainStack);
     }
 
     @Override
@@ -63,7 +65,8 @@ class JLineInteractiveShell implements Shell{
         LineReaderBuilder readerBuilder = LineReaderBuilder.builder();
         List<Completer> completors = new LinkedList<Completer>();
 
-        completors.add(new StringsCompleter(commandsList));
+        //completors.add(new StringsCompleter(commandsList));
+        completors.add(domainOpCompleter);
         readerBuilder.completer(new ArgumentCompleter(completors));
 
         LineReader reader = readerBuilder.build();
