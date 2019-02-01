@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.molecule.util.CollectionUtils.KV;
@@ -78,6 +79,14 @@ public class DefaultMainModule extends AbstractModule{
         bindConfigsSources();
 
         bindFuns();
+
+        bindFunc();
+    }
+
+    private void bindFunc() {
+        Multibinder<Function<Param,Param>> funcSet = Multibinder.newSetBinder(binder(),new TypeLiteral<Function<Param,Param>>(){},
+                Func.class);
+
     }
 
     private void bindFuns() {
@@ -217,6 +226,7 @@ public class DefaultMainModule extends AbstractModule{
         return new DefaultFnBus(fns,fnsList,eventBus,configurationSource);
     }
 
+    //public List<Fn> provideListOfFnForFuncAnnotated()
 
 
 }

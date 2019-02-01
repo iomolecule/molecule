@@ -10,6 +10,7 @@ public class SimpleOperation implements Operation{
     private String name;
     private URI fnURI;
     private String documentation;
+    private String simpleName;
 
     public SimpleOperation(String name){
         this(name,(URI)null,"Not available at present");
@@ -20,6 +21,12 @@ public class SimpleOperation implements Operation{
         this.name = name;
         this.fnURI = fnURI;
         this.documentation = doc;
+        String[] splitNames = name.split("\\.");
+        if(splitNames != null && splitNames.length > 0){
+            simpleName = splitNames[splitNames.length-1];
+        }else{
+            simpleName = name;
+        }
     }
 
     public SimpleOperation(String name,String uriString,String doc){
@@ -30,6 +37,13 @@ public class SimpleOperation implements Operation{
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+        String[] splitNames = name.split("\\.");
+        if(splitNames != null && splitNames.length > 0){
+            simpleName = splitNames[splitNames.length-1];
+        }else{
+            simpleName = name;
+        }
+
     }
 
     @Override
@@ -45,6 +59,11 @@ public class SimpleOperation implements Operation{
     @Override
     public String getDoc() {
         return documentation;
+    }
+
+    @Override
+    public String getSimpleName() {
+        return simpleName;
     }
 
     @Override

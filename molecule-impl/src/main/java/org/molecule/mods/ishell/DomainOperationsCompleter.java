@@ -25,6 +25,8 @@ class DomainOperationsCompleter implements Completer{
     public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> candidates) {
         assert candidates != null;
 
+        //System.out.println(" ParsedLine "+parsedLine.word());
+
         String fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
 
         List<String> operationsAt = domainService.getOperationsAt(fullyQualifiedDomain);
@@ -33,8 +35,11 @@ class DomainOperationsCompleter implements Completer{
 
 
             for (String opName : operationsAt) {
-                Candidate candidate = new Candidate(opName);
-                candidates.add(candidate);
+                String word = parsedLine.word();
+                if(opName.startsWith(word)) {
+                    Candidate candidate = new Candidate(opName);
+                    candidates.add(candidate);
+                }
             }
 
         }

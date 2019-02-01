@@ -32,9 +32,16 @@ class ChangeDomainFunction implements Function<Param, Param> {
 
                 String destinationDomain = args.get(0);
 
-                if (!destinationDomain.equalsIgnoreCase("/")) {
-
+                if(destinationDomain.equals("/")){
+                    domainStack.clear();
+                    domainStack.push(JLineInteractiveShell.ROOT_DOMAIN);
+                }else if(destinationDomain.equals("..")){
+                    if(domainStack.size()>1){
+                        domainStack.pop(); //navigate to previous domain till root domain, beyond which it is invalid
+                    }
+                }else{
                     String fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
+                    String fullyQualifiedDomainPath = JLineInteractiveShell.getPrompt(domainStack,"");
 
                     if (domainService.isValidDomainAt(fullyQualifiedDomain, destinationDomain)) {
 
@@ -44,11 +51,8 @@ class ChangeDomainFunction implements Function<Param, Param> {
                         fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
 
                     } else {
-                        System.out.println(String.format("Domain %s is not a valid domain under %s", destinationDomain, fullyQualifiedDomain));
+                        System.out.println(String.format("Domain %s is not a valid domain under %s", destinationDomain, fullyQualifiedDomainPath));
                     }
-                } else {
-                    domainStack.clear();
-                    domainStack.push(JLineInteractiveShell.ROOT_DOMAIN);
                 }
 
             } else {

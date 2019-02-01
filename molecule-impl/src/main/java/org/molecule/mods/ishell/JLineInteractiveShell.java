@@ -405,7 +405,7 @@ class JLineInteractiveShell implements Shell{
             String domStr = domainStack.get(i);
             if(!domStr.isEmpty()){
                 fullyQualifiedDomain.append(domStr);
-                if(i < domainStack.size()) {
+                if((i+1) < domainStack.size()) {
                     fullyQualifiedDomain.append(".");
                 }
             }

@@ -10,4 +10,6 @@ public interface Operation {
 
     public String getDoc();
 
+    public String getSimpleName();
+
 }

@@ -4,6 +4,7 @@ import org.molecule.system.Operation;
 import org.molecule.system.Param;
 import org.molecule.system.services.DomainService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
@@ -28,16 +29,18 @@ class ListHelpFunction implements Function<Param,Param> {
 
         String fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
 
+
         if(!fullyQualifiedDomain.isEmpty()) {
             List<Operation> currentDomainOperations = domainService.getAllOperationsAt(fullyQualifiedDomain);
+
             rootOperations.addAll(currentDomainOperations);
         }
 
+
         rootOperations.forEach(operation -> {
-            System.out.println(getFormattedHelpMessage(helpMessageWidth,operation.getName(),operation.getDoc()));
+            System.out.println(getFormattedHelpMessage(helpMessageWidth,operation.getSimpleName(),operation.getDoc()));
         });
 
-        //param = param.plus(OUT_HELP_LIST,rootOperations);
 
         return param;
     }
