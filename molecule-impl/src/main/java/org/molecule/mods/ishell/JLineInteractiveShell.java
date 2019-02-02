@@ -7,6 +7,7 @@ import org.jline.reader.*;
 import org.jline.reader.impl.completer.ArgumentCompleter;
 import org.jline.reader.impl.completer.StringsCompleter;
 import org.molecule.commons.Constants;
+import org.molecule.ishell.annotations.DomainStack;
 import org.molecule.system.*;
 import org.molecule.system.services.DomainService;
 import org.molecule.system.services.FnBus;
@@ -27,7 +28,7 @@ import static org.molecule.mods.ishell.IShellConstants.EXIT_SYSTEM;
 @Slf4j
 class JLineInteractiveShell implements Shell{
 
-    static final String SHELL_STACK = "org.molecule.mods.ishell.jline.shell-stack";
+
     static final String ROOT_DOMAIN = "";
 
     private String[] commandsList;
@@ -49,7 +50,7 @@ class JLineInteractiveShell implements Shell{
     private FnBus fnBus;
 
     @Inject
-    JLineInteractiveShell(DomainService domainService, FnBus fnBus,@Named(JLineInteractiveShell.SHELL_STACK) Stack<String> domainStack){
+    JLineInteractiveShell(DomainService domainService, FnBus fnBus,@DomainStack Stack<String> domainStack){
         commandsList = new String[]{"help","domains","ops","cd","pwd","exec","exit"};
         this.domainService = domainService;
         this.fnBus = fnBus;

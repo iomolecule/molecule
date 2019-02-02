@@ -2,19 +2,17 @@ package org.molecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
+import org.molecule.commons.Constants;
 import org.molecule.config.ConfigurationSource;
-import org.molecule.system.Fn;
-import org.molecule.system.LifecycleException;
-import org.molecule.system.Param;
-import org.molecule.system.ParamDeclaration;
+import org.molecule.system.*;
 import org.molecule.system.services.FnBus;
+import org.molecule.util.FnUtils;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.molecule.commons.Constants.*;
@@ -25,6 +23,7 @@ class DefaultFnBus implements FnBus{
 
     private Set<Fn> fns;
     private Set<List<Fn>> fnsSets;
+    private Set<Function<Param,Param>> functionSet;
 
     private EventBus eventBus;
 
@@ -60,6 +59,26 @@ class DefaultFnBus implements FnBus{
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
         this.fnsSets = fnSets;
+        this.eventBus = eventBus;
+        this.messageConfigProvider = messageConfigProvider;
+
+        try {
+            uri = new URI(String.format("%s://%s", FUNCTION_SCHEME, FNBUS_NAME));
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    DefaultFnBus(Set<Fn> fnSet,
+                 Set<List<Fn>> fnSets,
+                 Set<Function<Param,Param>> functionSet,
+                 EventBus eventBus,
+                 ConfigurationSource messageConfigProvider){
+        checkArgument(fnSet != null,"Set of Fns cannot be null!");
+        checkArgument(eventBus != null, "EventBus cannot be null!");
+        this.fns = fnSet;
+        this.fnsSets = fnSets;
+        this.functionSet = functionSet;
         this.eventBus = eventBus;
         this.messageConfigProvider = messageConfigProvider;
 
@@ -130,13 +149,19 @@ class DefaultFnBus implements FnBus{
         return outParam;
     }
 
-    private Param handleFunctionCall(URI funURI, Param param) {
+    private Param handleFunctionCall(URI funURI,
+                                     Param param) {
         if(fnMap.containsKey(funURI)){
             Fn fnToInvoke = fnMap.get(funURI);
             try {
+                //verify the incoming params and check if any mandatory params are missing or
+                // type mismatching from what is expected
+                param = FnUtils.verifyInParams(param,fnToInvoke.getInDeclarations());
                 Param outParam = fnToInvoke.apply(param);
-                //List<ParamDeclaration> outDeclarations = fnToInvoke.getOutDeclarations();
-                //outParam = outParam.plus(OUT_PARAMS,outDeclarations);
+
+                //verify whether the out going parameters are valid and provided as promised by the fn
+                //any mismatch or missing parameters against the one declared by the Fn a runtime exception is thrown
+                outParam = FnUtils.mapOutParams(outParam,fnToInvoke.getOutDeclarations(), Constants.OUT_PARAMS);
                 return outParam;
             }catch(Exception e){
                 return handleException(e,param);
@@ -180,6 +205,59 @@ class DefaultFnBus implements FnBus{
                 }
 
             }
+
+            if(functionSet != null && !functionSet.isEmpty()){
+                List<Fn> listOfFns = getListOfFnsFromFunctions(functionSet);
+
+                for (Fn fn : listOfFns) {
+                    fnMap.put(fn.getURI(),fn);
+                }
+
+            }
         }
+    }
+
+    private List<Fn> getListOfFnsFromFunctions(Set<Function<Param, Param>> functionLists) {
+        List<Fn> listOfFns = new ArrayList<>();
+
+            for (Function<Param, Param> paramParamFunction : functionLists) {
+                try {
+                    Fn fn = transferFunctionToFn(paramParamFunction);
+                    listOfFns.add(fn);
+                }catch(Exception e){
+                    String message = String.format("Error %s occured while processing Fn Class %s, so ignoring the function from being registered!",e.getMessage(),paramParamFunction.getClass());
+                    log.warn(message);
+                }
+            }
+
+
+        return listOfFns;
+
+    }
+
+    private Fn transferFunctionToFn(Function<Param, Param> function) {
+        URI uri = null;
+        //String doc = null;
+        List<ParamDeclaration> inParams = null;
+        List<ParamDeclaration> outParams = null;
+        Class fnClass = function.getClass();
+        try {
+            uri = FnUtils.getURI(fnClass);
+            try {
+                inParams = FnUtils.getInParams(fnClass);
+                outParams = FnUtils.getOutParams(fnClass);
+            }catch(Exception ex){
+
+            }
+            //doc = FnUtils.getDoc(fnClass);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        Fn newFn = new URIFn(uri,function,inParams,outParams);
+
+        return newFn;
+
     }
 }

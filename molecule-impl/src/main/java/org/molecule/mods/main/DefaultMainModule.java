@@ -220,10 +220,10 @@ public class DefaultMainModule extends AbstractModule{
 
     @Provides
     @Singleton
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList, @AsyncEventBus EventBus eventBus,
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,@Func Set<Function<Param,Param>> functions, @AsyncEventBus EventBus eventBus,
                                      ConfigurationSource configurationSource){
 
-        return new DefaultFnBus(fns,fnsList,eventBus,configurationSource);
+        return new DefaultFnBus(fns,fnsList,functions,eventBus,configurationSource);
     }
 
     //public List<Fn> provideListOfFnForFuncAnnotated()

@@ -1,17 +1,24 @@
 package org.molecule.mods.ishell;
 
+import org.molecule.ishell.annotations.DomainStack;
 import org.molecule.system.Param;
+import org.molecule.system.annotations.Id;
 import org.molecule.system.services.DomainService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
+@Id("function://system/ishell/jline/listDomainsFun")
 class ListCurrentDomainsFunction implements Function<Param,Param> {
 
     private DomainService domainService;
     private Stack<String> shellStack;
-    ListCurrentDomainsFunction(DomainService service, Stack<String> shellStack){
+
+    @Inject
+    ListCurrentDomainsFunction(DomainService service, @DomainStack Stack<String> shellStack){
         this.domainService = service;
         this.shellStack = shellStack;
     }

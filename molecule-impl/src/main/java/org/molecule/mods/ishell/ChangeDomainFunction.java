@@ -1,20 +1,26 @@
 package org.molecule.mods.ishell;
 
+import org.molecule.ishell.annotations.DomainStack;
 import org.molecule.system.Param;
+import org.molecule.system.annotations.Id;
 import org.molecule.system.services.DomainService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
 import static org.molecule.commons.Constants.IN_PARAMS;
 
+@Id("function://system/ishell/jline/changeDomainFun")
 class ChangeDomainFunction implements Function<Param, Param> {
 
     private Stack<String> domainStack;
     private DomainService domainService;
 
-    public ChangeDomainFunction(DomainService domainService, Stack<String> domainStack) {
+    @Inject
+    public ChangeDomainFunction(DomainService domainService, @DomainStack Stack<String> domainStack) {
         this.domainStack = domainStack;
         this.domainService = domainService;
     }

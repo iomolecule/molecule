@@ -1,14 +1,19 @@
 package org.molecule.mods.ishell;
 
+import org.molecule.ishell.annotations.DomainStack;
 import org.molecule.system.Operation;
 import org.molecule.system.Param;
+import org.molecule.system.annotations.Id;
 import org.molecule.system.services.DomainService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
+@Id("function://system/ishell/jline/listHelpFun")
 class ListHelpFunction implements Function<Param,Param> {
 
     static final String OUT_HELP_LIST = "help-list";
@@ -17,7 +22,8 @@ class ListHelpFunction implements Function<Param,Param> {
     private DomainService domainService;
     private Stack<String> domainStack;
 
-    ListHelpFunction(DomainService domainService, Stack<String> domainStack){
+    @Inject
+    ListHelpFunction(DomainService domainService, @DomainStack Stack<String> domainStack){
         this.domainService = domainService;
         this.domainStack = domainStack;
     }
