@@ -84,8 +84,20 @@ public class InOutParam implements Param {
     }
 
     @Override
-    public List<ParamDeclaration> outParams() {
-        return (List<ParamDeclaration>)delegate.getOrDefault(Constants.OUT_PARAMS, Collections.EMPTY_LIST);
+    public Map<String,Object> outParams() {
+        return (Map<String,Object>)delegate.getOrDefault(Constants.OUT_PARAMS, PersistentHashMap.emptyMap());
+    }
+
+    @Override
+    public boolean hasOutParams(){
+        boolean retVal = false;
+        if(delegate.containsKey(Constants.OUT_PARAMS)){
+            Map<String,Object> outParam = outParams();
+            if(outParam != null && !outParam.isEmpty()){
+                retVal = true;
+            }
+        }
+        return retVal;
     }
 
     @Override

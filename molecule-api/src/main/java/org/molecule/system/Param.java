@@ -32,5 +32,7 @@ public interface Param {
 
     public Map<String,Object> asMap();
 
-    public List<ParamDeclaration> outParams();
+    public Map<String,Object> outParams();
+
+    public boolean hasOutParams();
 }

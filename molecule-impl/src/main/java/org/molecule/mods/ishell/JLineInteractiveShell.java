@@ -1,5 +1,6 @@
 package org.molecule.mods.ishell;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Splitter;
 import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.AnsiConsole;
@@ -17,13 +18,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.molecule.mods.ishell.IShellConstants.EXIT_SYSTEM;
+import static org.molecule.util.JSONUtils.OBJECT_MAPPER;
 
 @Slf4j
 class JLineInteractiveShell implements Shell{
@@ -135,11 +134,16 @@ class JLineInteractiveShell implements Shell{
         String fullyQualifiedCurrentDomain = getFullyQualifiedDomain(domainStack);
         List<String> rootOperationList = domainService.getOperationsAt(fullyQualifiedCurrentDomain);
         if(rootOperationList.contains(command)){
-            Operation operation = domainService.getOperation(command);
+            String commandPath = fullyQualifiedCurrentDomain.isEmpty() == false ? fullyQualifiedCurrentDomain + "." +command : command;
+            Operation operation = domainService.getOperation(commandPath);
+            //log.info("Operation {}",operation);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
+            //log.info("In Params {}",inParam);
             Param outParam = fnBus.apply(inParam);
-            log.info("Received Out {}",outParam);
+            if(outParam.hasOutParams()){
+                prettyPrintOutput(outParam);
+            }
         }else{
             throw new InvalidOperationException(String.format("Operation %s is invalid for domain %s",command,fullyQualifiedCurrentDomain));
         }
@@ -157,11 +161,25 @@ class JLineInteractiveShell implements Shell{
             if(outParam.containsKey(EXIT_SYSTEM)){
                 retVal = (Boolean)outParam.get(EXIT_SYSTEM);
             }
+
+            if(outParam.hasOutParams()){
+                prettyPrintOutput(outParam);
+            }
             //log.info("Received Out {}",outParam);
         }else{
             throw new InvalidOperationException(String.format("Operation %s is invalid for domain %s",command,"/"));
         }
         return retVal;
+    }
+
+    private void prettyPrintOutput(Param outParam) {
+        Map<String, Object> outParamMap = outParam.outParams();
+        try {
+            String outputString = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(outParamMap);
+            System.out.println(outputString);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     /*private void printHelp() {

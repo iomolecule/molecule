@@ -84,6 +84,8 @@ public class DefaultMainModule extends MoleculeModule{
         bindFunc();
 
         initModule();
+
+        registerFuncs(ListAllFnsFunction.class);
     }
 
     private void bindFunc() {

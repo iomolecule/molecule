@@ -1,0 +1,9 @@
+{
+  "system": {
+    "ls-fns": {
+      "uri": "function://system/main/listAllFnsFunction",
+      "doc": "List all Fns registered in the System"
+    }
+  }
+}
+

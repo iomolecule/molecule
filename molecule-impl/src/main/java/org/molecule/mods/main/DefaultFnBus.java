@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.molecule.commons.Constants.*;
+import static org.molecule.util.CollectionUtils.LIST;
 import static org.molecule.util.StringUtils.format;
 
 @Slf4j
@@ -34,6 +35,12 @@ class DefaultFnBus implements FnBus{
     private boolean started;
 
     private ConfigurationSource messageConfigProvider;
+
+    private static List<ParamDeclaration> errorOutParamDeclaration = LIST(ParamDeclaration.class,
+            new DefaultParamDeclaration(STATUS,String.class,true),
+            new DefaultParamDeclaration(REASON,String.class,true));
+
+
 
     DefaultFnBus(Set<Fn> fnSet,
                  EventBus eventBus,
@@ -91,7 +98,9 @@ class DefaultFnBus implements FnBus{
 
     @Override
     public void forEach(Consumer<Fn> fnConsumer) {
-        fns.forEach(fnConsumer);
+
+        Collection<Fn> fnCollection = fnMap.values();
+        fnCollection.forEach(fnConsumer);
     }
 
     @Override
@@ -131,6 +140,7 @@ class DefaultFnBus implements FnBus{
     @Override
     public Param apply(Param param) {
         if(param.containsKey(FUNCTION_TO_INVOKE)){
+            //log.info("Function To Invoke {}",param.get(FUNCTION_TO_INVOKE));
             return handleFunctionCall((URI)param.get(FUNCTION_TO_INVOKE),param);
         }else{
             return handleError(ERROR_NO_FUNCTION_TO_INVOKE_SPECIFIED,param);
@@ -138,7 +148,7 @@ class DefaultFnBus implements FnBus{
     }
 
     private Param handleError(String errorCode, Param param) {
-        log.info("Error on Function Call {}",errorCode);
+        log.debug("Error on Function Call {}",errorCode);
         Param outParam = param.plus(STATUS,FAILED);
         if(messageConfigProvider.isValid(errorCode)) {
             outParam = outParam.plus(REASON,
@@ -146,11 +156,15 @@ class DefaultFnBus implements FnBus{
         }else{
             outParam = outParam.plus(REASON,errorCode);
         }
+
+        outParam = FnUtils.mapOutParams(outParam, errorOutParamDeclaration, Constants.OUT_PARAMS);
+
         return outParam;
     }
 
     private Param handleFunctionCall(URI funURI,
                                      Param param) {
+        //log.info("Checking FunURI {}",funURI);
         if(fnMap.containsKey(funURI)){
             Fn fnToInvoke = fnMap.get(funURI);
             try {
@@ -158,9 +172,10 @@ class DefaultFnBus implements FnBus{
                 // type mismatching from what is expected
                 param = FnUtils.verifyInParams(param,fnToInvoke.getInDeclarations());
                 Param outParam = fnToInvoke.apply(param);
-
+                //log.info("Out Param {}",outParam);
                 //verify whether the out going parameters are valid and provided as promised by the fn
                 //any mismatch or missing parameters against the one declared by the Fn a runtime exception is thrown
+                //log.info("Out Params {}",fnToInvoke.getOutDeclarations());
                 outParam = FnUtils.mapOutParams(outParam,fnToInvoke.getOutDeclarations(), Constants.OUT_PARAMS);
                 return outParam;
             }catch(Exception e){
@@ -210,6 +225,7 @@ class DefaultFnBus implements FnBus{
                 List<Fn> listOfFns = getListOfFnsFromFunctions(functionSet);
 
                 for (Fn fn : listOfFns) {
+                    log.info("Processing Fn {}",fn.getURI());
                     fnMap.put(fn.getURI(),fn);
                 }
 
@@ -245,8 +261,13 @@ class DefaultFnBus implements FnBus{
             uri = FnUtils.getURI(fnClass);
             try {
                 inParams = FnUtils.getInParams(fnClass);
-                outParams = FnUtils.getOutParams(fnClass);
             }catch(Exception ex){
+
+            }
+
+            try {
+                outParams = FnUtils.getOutParams(fnClass);
+            }catch(Exception e){
 
             }
             //doc = FnUtils.getDoc(fnClass);
