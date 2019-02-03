@@ -1,0 +1,9 @@
+{
+  "name" : "jline-interactiveshell",
+  "version" : "1.0.0",
+  "vendor" : "molecule",
+  "attributes" : {
+    "shell-type" : "interactive",
+    "implementation" : "jline"
+  }
+}

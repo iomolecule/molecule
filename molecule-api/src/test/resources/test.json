@@ -1,0 +1,57 @@
+{
+  "root" : {
+    "domain1" :{
+      "operation0" : {
+        "uri" : "function://test3"
+      },
+      "operation3" : {
+        "uri" : "function://test3",
+        "doc" : "some test3 function"
+      },
+      "operation4" : {
+        "uri" : "function://test4",
+        "doc" : "some test4 function"
+      },
+      "operation5" : {
+        "uri" : "function://test5",
+        "doc" : "some test5 function"
+      },
+      "domain2" : {
+        "operation1" : {
+          "uri" : "function://test1",
+          "doc" : "some test function"
+        },
+        "operation2" : {
+          "uri" : "function://test2",
+          "doc" : "some test2 function"
+        },
+        "domain3" : {
+          "domain4" : {
+            "domain5" : {
+              "domain6" : {
+                "domain7" : {
+                  "login" : {
+                    "uri" : "function://login",
+                    "doc" : "some documentation"
+                  },
+                  "logout" : {
+                    "uri" : "function://logout",
+                    "doc" : "some documentation"
+                  },
+                  "search" : {
+                    "uri" : "function://search",
+                    "doc" : "some documentation"
+                  },
+                  "searchNew" : {
+                    "doc" : "some documentation"
+                  }
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

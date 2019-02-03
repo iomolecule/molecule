@@ -71,6 +71,8 @@ public class SimpleOperation implements Operation{
         return "SimpleOperation{" +
                 "name='" + name + '\'' +
                 ", fnURI=" + fnURI +
+                ", documentation='" + documentation + '\'' +
+                ", simpleName='" + simpleName + '\'' +
                 '}';
     }
 }

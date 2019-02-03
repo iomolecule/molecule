@@ -1,0 +1,34 @@
+{
+  "help" :{
+    "uri" : "function://system/ishell/jline/listHelpFun",
+    "doc" : "Show this help!"
+  },
+  "exit" :{
+    "uri" : "function://system/ishell/jline/exitSystemFun",
+    "doc" : "Exits the system!"
+  },
+  "domains" : {
+    "uri" : "function://system/ishell/jline/listDomainsFun",
+    "doc" : "List all valid accessible domains within the current active domain"
+  },
+  "ops" : {
+    "uri" : "function://system/ishell/jline/listOperationsFun",
+    "doc" : "List all valid accessible operations within the current active domain"
+  },
+  "cd" : {
+    "uri" : "function://system/ishell/jline/changeDomainFun",
+    "doc" : "Change to the specified domain"
+  },
+  "pwd" : {
+    "uri" : "function://system/ishell/jline/getPresentWorkingDomainFun",
+    "doc" : "Prints the present working domain"
+  },
+  "modules" : {
+    "uri" : "function://system/ishell/jline/listModulesFun",
+    "doc" : "Lists installed modules within the system"
+  },
+  "about" : {
+    "uri" : "function://system/ishell/jline/aboutModuleFun",
+    "doc" : "Provides details about a specified module given its name"
+  }
+}

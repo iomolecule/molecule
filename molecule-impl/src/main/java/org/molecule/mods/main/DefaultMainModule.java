@@ -14,6 +14,7 @@ import org.molecule.config.CompositeConfigurationSource;
 import org.molecule.config.ConfigurationSource;
 import org.molecule.config.annotations.ConfigsSource;
 import org.molecule.module.ModuleInfo;
+import org.molecule.module.MoleculeModule;
 import org.molecule.module.annotations.ModulesInfo;
 import org.molecule.system.*;
 import org.molecule.system.annotations.*;
@@ -36,7 +37,7 @@ import static org.molecule.util.CollectionUtils.KV;
 import static org.molecule.util.CollectionUtils.MAP;
 
 @Slf4j
-public class DefaultMainModule extends AbstractModule{
+public class DefaultMainModule extends MoleculeModule{
 
     private ModuleInfo systemInfo;
     private ConfigurationSource[] configSources;
@@ -81,6 +82,8 @@ public class DefaultMainModule extends AbstractModule{
         bindFuns();
 
         bindFunc();
+
+        initModule();
     }
 
     private void bindFunc() {
@@ -150,16 +153,6 @@ public class DefaultMainModule extends AbstractModule{
         bind(LifecycleManager.class).to(lifecycleManagerClass).in(Singleton.class);
     }
 
-    @ProvidesIntoSet
-    @ModulesInfo
-    public ModuleInfo provideSystemInfo(){
-        if(systemInfo != null){
-            return systemInfo;
-        }else{
-            return new ModuleInfo("Main","1.0.0","Molecule",MAP(KV("default",true)));
-        }
-    }
-
 
     @Provides
     @SyncEventBus
@@ -226,7 +219,7 @@ public class DefaultMainModule extends AbstractModule{
         return new DefaultFnBus(fns,fnsList,functions,eventBus,configurationSource);
     }
 
-    //public List<Fn> provideListOfFnForFuncAnnotated()
+
 
 
 }

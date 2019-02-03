@@ -43,12 +43,7 @@ public class Main1 {
                 .withLifecycleManager(SimpleLifecycleManager.class)
                 .withOnStartup(StartupMain.class)
                 .withModules(
-                        new TestModule(),
-                        new JLineInteractiveShellModule(),
-                        new SomeNewModule(),
-                        new SomeOtherNewModule(new ModuleInfo("one","1.3.4","x",MAP())),
-                        new SomeOtherNewModule(new ModuleInfo("two","1.3.4","x",MAP())),
-                        new SomeOtherNewModule(new ModuleInfo("three","1.3.4","x",MAP())))
+                        new JLineInteractiveShellModule())
                 .build();
 
 
@@ -147,11 +142,10 @@ class ExitMain implements OnExit{
 
 class SomeNewModule extends AbstractModule {
 
-    @ProvidesIntoSet
-    @ModulesInfo
-    public ModuleInfo provideModuleInfo(){
-        return new ModuleInfo("SomeNewModule","1.2.0","abc-vendor",
-                MAP(KV("some-new-attribute","some-value")));
+
+    @Override
+    protected void configure() {
+        super.configure();
     }
 
     @ProvidesIntoSet
@@ -160,14 +154,7 @@ class SomeNewModule extends AbstractModule {
         return new AnotherEventSink();
     }
 
-    @ProvidesIntoSet
-    @DomainOperations
-    public List<Operation> provideDomaiOperations(){
-        return LIST(Operation.class,
-                new SimpleOperation("domain2.testOperation2","function://simple/testFun2",""),
-                new SimpleOperation("domain2.subdomain1.testOperation3","function://simple/testFun3","")
-        );
-    }
+
 }
 
 
