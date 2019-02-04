@@ -1,10 +1,18 @@
 package org.molecule.config;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class CompositeConfigurationSource implements ConfigurationSource{
 
     private Set<ConfigurationSource> configurationSources;
+
+    public CompositeConfigurationSource(Set<ConfigurationSource> defaultConfigurationSources,
+                                        Set<ConfigurationSource> configurationSources){
+        Set<ConfigurationSource> mergedSources = new LinkedHashSet<>();
+        mergedSources.addAll(defaultConfigurationSources);
+        mergedSources.addAll(configurationSources);
+    }
 
     public CompositeConfigurationSource(Set<ConfigurationSource> configurationSources){
         this.configurationSources = configurationSources;
@@ -19,7 +27,7 @@ public class CompositeConfigurationSource implements ConfigurationSource{
         }
 
         throw new ConfigurationNotFoundException(
-                String.format("Could not find the configuration for path % in any of the configured configuration sources %s",path,configurationSources));
+                String.format("Could not find the configuration for path %s in any of the configured configuration sources %s",path,configurationSources));
     }
 
     @Override

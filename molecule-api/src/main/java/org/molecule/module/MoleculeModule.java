@@ -7,8 +7,11 @@ import com.google.inject.multibindings.Multibinder;
 import io.datatree.Tree;
 import lombok.extern.slf4j.Slf4j;
 import org.molecule.config.ConfigurationSource;
+import org.molecule.config.InputStreamConfigurationSource;
 import org.molecule.config.InputStreamMsgConfigSource;
 import org.molecule.config.MsgConfigSource;
+import org.molecule.config.annotations.ConfigsSource;
+import org.molecule.config.annotations.DefaultConfigsSource;
 import org.molecule.config.annotations.MsgConfigsSource;
 import org.molecule.module.annotations.ModulesInfo;
 import org.molecule.system.Operation;
@@ -41,7 +44,32 @@ public abstract class MoleculeModule extends AbstractModule{
     protected void initModule(){
         registerSystemInfoFromDefaultPath();
         registerDomainOperationsFromDefaultPath();
+        registerConfigSourcesFromDefaultPath();
         registerMsgConfigSourcesFromDefaultPath();
+    }
+
+    protected void registerConfigSourcesFromDefaultPath() {
+        String configFile = String.format("/config/%s.json", getClass().getName());
+        try(InputStream resourceAsStream = getClass().getResourceAsStream(configFile)){
+            if(resourceAsStream != null){
+                InputStreamConfigurationSource inputStreamConfigurationSource =
+                        new InputStreamConfigurationSource(false,true,resourceAsStream);
+                registerConfigSource(inputStreamConfigurationSource);
+            }else{
+                log.info("Unable to find default config file {} in classpath!",configFile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.warn("Failed to read {}, so ignoring config file..",configFile);
+        }
+
+    }
+
+    private void registerConfigSource(ConfigurationSource configurationSource) {
+        Multibinder<ConfigurationSource> configSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                DefaultConfigsSource.class);
+        configSources.addBinding().toInstance(configurationSource);
+
     }
 
     protected void registerMsgConfigSourcesFromDefaultPath() {
@@ -127,8 +155,7 @@ public abstract class MoleculeModule extends AbstractModule{
             if(inputStream != null){
                 byte[] bytes = ByteStreams.toByteArray(inputStream);
                 Tree dataTree = new Tree(bytes);
-                List<Operation> operations = getOperations(dataTree, "");
-                return operations;
+                return getOperations(dataTree, "");
             }else{
                 log.warn(String.format("Failed to read %s, so ignoring domain information..",fileInClasspath));
                 return Collections.EMPTY_LIST;

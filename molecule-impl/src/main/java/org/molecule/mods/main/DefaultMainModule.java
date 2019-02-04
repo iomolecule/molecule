@@ -15,6 +15,7 @@ import org.molecule.config.CompositeMsgConfigSource;
 import org.molecule.config.ConfigurationSource;
 import org.molecule.config.MsgConfigSource;
 import org.molecule.config.annotations.ConfigsSource;
+import org.molecule.config.annotations.DefaultConfigsSource;
 import org.molecule.config.annotations.MsgConfigsSource;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.MoleculeModule;
@@ -116,6 +117,8 @@ public class DefaultMainModule extends MoleculeModule{
     private void bindConfigsSources() {
         Multibinder<ConfigurationSource> configsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
                 ConfigsSource.class);
+        Multibinder<ConfigurationSource> defaultConfigsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                DefaultConfigsSource.class);
 
     }
 
@@ -219,8 +222,10 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Provides
     @Singleton
-    public ConfigurationSource provideCompositeConfigSource(@ConfigsSource Set<ConfigurationSource> configurationSources){
-        return new CompositeConfigurationSource(configurationSources);
+    public ConfigurationSource provideCompositeConfigSource(
+            @DefaultConfigsSource Set<ConfigurationSource> defaultConfigurationSources,
+            @ConfigsSource Set<ConfigurationSource> configurationSources){
+        return new CompositeConfigurationSource(defaultConfigurationSources,configurationSources);
     }
 
     @Provides
