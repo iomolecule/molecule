@@ -4,8 +4,7 @@ import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.molecule.commons.Constants;
-import org.molecule.config.ConfigurationSource;
-import org.molecule.config.InputStreamConfigurationSource;
+import org.molecule.config.*;
 import org.molecule.system.Fn;
 import org.molecule.system.InOutParam;
 import org.molecule.system.LifecycleException;
@@ -139,8 +138,8 @@ public class FnBusTests {
     }
 
 
-    private ConfigurationSource getMessageConfigProvider(){
-        return new InputStreamConfigurationSource(false,false,
+    private MsgConfigSource getMessageConfigProvider(){
+        return new InputStreamMsgConfigSource(false,false,
                 getClass().getResourceAsStream("/test/fn-bus-test.json"));
     }
 }

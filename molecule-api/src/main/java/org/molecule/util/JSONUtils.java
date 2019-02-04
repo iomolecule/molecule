@@ -108,4 +108,15 @@ public class JSONUtils {
     }
 
 
+    public static String toJSONPointer(String str) {
+        if(str != null && !str.isEmpty()){
+            StringBuffer buffer = new StringBuffer();
+            if(!str.startsWith("/")){
+                buffer.append("/");
+            }
+            buffer.append(str.replaceAll("\\.","/"));
+            return buffer.toString();
+        }
+        return str;
+    }
 }

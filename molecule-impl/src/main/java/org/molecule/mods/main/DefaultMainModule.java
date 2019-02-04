@@ -11,8 +11,11 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.extern.slf4j.Slf4j;
 import org.molecule.config.CompositeConfigurationSource;
+import org.molecule.config.CompositeMsgConfigSource;
 import org.molecule.config.ConfigurationSource;
+import org.molecule.config.MsgConfigSource;
 import org.molecule.config.annotations.ConfigsSource;
+import org.molecule.config.annotations.MsgConfigsSource;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.MoleculeModule;
 import org.molecule.module.annotations.ModulesInfo;
@@ -79,6 +82,8 @@ public class DefaultMainModule extends MoleculeModule{
 
         bindConfigsSources();
 
+        bindMsgConfigsSources();
+
         bindFuns();
 
         bindFunc();
@@ -86,6 +91,11 @@ public class DefaultMainModule extends MoleculeModule{
         initModule();
 
         registerFuncs(ListAllFnsFunction.class);
+    }
+
+    private void bindMsgConfigsSources() {
+        Multibinder<ConfigurationSource> msgConfigSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                MsgConfigsSource.class);
     }
 
     private void bindFunc() {
@@ -215,10 +225,16 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Provides
     @Singleton
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,@Func Set<Function<Param,Param>> functions, @AsyncEventBus EventBus eventBus,
-                                     ConfigurationSource configurationSource){
+    public MsgConfigSource provideMessageConfigSource(@MsgConfigsSource Set<ConfigurationSource> messageConfigSources){
+        return new CompositeMsgConfigSource(messageConfigSources);
+    }
 
-        return new DefaultFnBus(fns,fnsList,functions,eventBus,configurationSource);
+    @Provides
+    @Singleton
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,@Func Set<Function<Param,Param>> functions, @AsyncEventBus EventBus eventBus,
+                                     MsgConfigSource msgConfigSource){
+
+        return new DefaultFnBus(fns,fnsList,functions,eventBus,msgConfigSource);
     }
 
 

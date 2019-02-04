@@ -6,6 +6,10 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import io.datatree.Tree;
 import lombok.extern.slf4j.Slf4j;
+import org.molecule.config.ConfigurationSource;
+import org.molecule.config.InputStreamMsgConfigSource;
+import org.molecule.config.MsgConfigSource;
+import org.molecule.config.annotations.MsgConfigsSource;
 import org.molecule.module.annotations.ModulesInfo;
 import org.molecule.system.Operation;
 import org.molecule.system.Param;
@@ -37,6 +41,31 @@ public abstract class MoleculeModule extends AbstractModule{
     protected void initModule(){
         registerSystemInfoFromDefaultPath();
         registerDomainOperationsFromDefaultPath();
+        registerMsgConfigSourcesFromDefaultPath();
+    }
+
+    protected void registerMsgConfigSourcesFromDefaultPath() {
+        String msgConfigFile = String.format("/msg-config/%s.json", getClass().getName());
+        try(InputStream resourceAsStream = getClass().getResourceAsStream(msgConfigFile)){
+            if(resourceAsStream != null){
+                InputStreamMsgConfigSource inputStreamMsgConfigSource =
+                        new InputStreamMsgConfigSource(false,false,
+                                resourceAsStream);
+                registerMsgConfigSource(inputStreamMsgConfigSource);
+            }else{
+                log.info("Unable to find default message config file {} in classpath!",msgConfigFile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.warn("Failed to read {}, so ignoring message config file..",msgConfigFile);
+        }
+
+    }
+
+    protected void registerMsgConfigSource(MsgConfigSource msgConfigSource) {
+        Multibinder<ConfigurationSource> msgConfigSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                MsgConfigsSource.class);
+        msgConfigSources.addBinding().toInstance(msgConfigSource);
     }
 
     protected void registerSystemInfoFromDefaultPath() {

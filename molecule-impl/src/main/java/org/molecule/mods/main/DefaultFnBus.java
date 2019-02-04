@@ -4,9 +4,11 @@ import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
 import org.molecule.commons.Constants;
 import org.molecule.config.ConfigurationSource;
+import org.molecule.config.MsgConfigSource;
 import org.molecule.system.*;
 import org.molecule.system.services.FnBus;
 import org.molecule.util.FnUtils;
+import org.molecule.util.JSONUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,7 +36,7 @@ class DefaultFnBus implements FnBus{
 
     private boolean started;
 
-    private ConfigurationSource messageConfigProvider;
+    private MsgConfigSource messageConfigProvider;
 
     private static List<ParamDeclaration> errorOutParamDeclaration = LIST(ParamDeclaration.class,
             new DefaultParamDeclaration(STATUS,String.class,true),
@@ -44,7 +46,7 @@ class DefaultFnBus implements FnBus{
 
     DefaultFnBus(Set<Fn> fnSet,
                  EventBus eventBus,
-                 ConfigurationSource messageConfigProvider){
+                 MsgConfigSource messageConfigProvider){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -61,7 +63,7 @@ class DefaultFnBus implements FnBus{
     DefaultFnBus(Set<Fn> fnSet,
                  Set<List<Fn>> fnSets,
                  EventBus eventBus,
-                 ConfigurationSource messageConfigProvider){
+                 MsgConfigSource messageConfigProvider){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -80,7 +82,7 @@ class DefaultFnBus implements FnBus{
                  Set<List<Fn>> fnSets,
                  Set<Function<Param,Param>> functionSet,
                  EventBus eventBus,
-                 ConfigurationSource messageConfigProvider){
+                 MsgConfigSource messageConfigProvider){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -150,9 +152,11 @@ class DefaultFnBus implements FnBus{
     private Param handleError(String errorCode, Param param) {
         log.debug("Error on Function Call {}",errorCode);
         Param outParam = param.plus(STATUS,FAILED);
-        if(messageConfigProvider.isValid(errorCode)) {
+        String messageJsonPointer = JSONUtils.toJSONPointer(errorCode);
+
+        if(messageConfigProvider.isValid(messageJsonPointer)) {
             outParam = outParam.plus(REASON,
-                    format(messageConfigProvider.get(errorCode, String.class, errorCode), outParam.asMap()));
+                    format(messageConfigProvider.get(messageJsonPointer, String.class, errorCode), outParam.asMap()));
         }else{
             outParam = outParam.plus(REASON,errorCode);
         }
