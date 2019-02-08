@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>molecule</artifactId>
-        <groupId>com.github.bogieclj.molecule</groupId>
+        <groupId>com.github.bogie-clj</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,7 +30,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.bogieclj.molecule</groupId>
+            <groupId>com.github.bogie-clj</groupId>
             <artifactId>molecule-api</artifactId>
         </dependency>
         <dependency>
