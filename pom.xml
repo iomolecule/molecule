@@ -18,7 +18,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.molecule</groupId>
+    <groupId>com.github.bogie-clj</groupId>
     <artifactId>molecule</artifactId>
     <packaging>pom</packaging>
     <version>0.1.1-SNAPSHOT</version>
@@ -137,20 +137,14 @@
 
             <!-- Molecule Dependencies -->
             <dependency>
-                <groupId>org.molecule</groupId>
+                <groupId>com.github.bogie-clj</groupId>
                 <artifactId>molecule-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.molecule</groupId>
+                <groupId>com.github.bogie-clj</groupId>
                 <artifactId>molecule-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.molecule</groupId>
-                <artifactId>molecule-logging</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -246,7 +240,7 @@
                 <configuration>
                     <overview>${basedir}/molecule-impl/src/main/javadoc/overview.html</overview>
                     <!-- Specific configuration for the aggregate report -->
-                    <excludePackageNames>org.molecule.mod.test1.*:org.molecule.mod.test2.*:org.molecule.playground.*</excludePackageNames>
+                    <excludePackageNames>com.github.bogieclj.molecule.mod.test1.*:com.github.bogieclj.molecule.mod.test2.*:com.github.bogieclj.molecule.playground.*</excludePackageNames>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -393,7 +387,7 @@
                         <phase>site</phase>
                         <configuration>
                             <!-- Specific configuration for the aggregate report -->
-                            <excludePackageNames>org.molecule.mod.test1.*:org.molecule.mod.test2.*:org.molecule.playground.*</excludePackageNames>
+                            <excludePackageNames>com.github.bogieclj.molecule.mod.test1.*:com.github.bogieclj.molecule.mod.test2.*:com.github.bogieclj.molecule.playground.*</excludePackageNames>
 
                         </configuration>
                     </execution>
