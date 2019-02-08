@@ -1,26 +1,39 @@
+/*
+ * Copyright 2019 Vijayakumar Mohan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.molecule.playground;
 
 import com.google.common.eventbus.Subscribe;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.molecule.mods.ishell.JLineInteractiveShellModule;
 import org.molecule.mods.main.SysBuilder;
 import org.molecule.module.ModuleInfo;
 import org.molecule.module.annotations.ModulesInfo;
-import org.molecule.system.LifecycleException;
-import org.molecule.system.OnExit;
-import org.molecule.system.OnStartup;
-import org.molecule.system.Sys;
+import org.molecule.system.*;
+import org.molecule.system.annotations.DomainOperations;
 import org.molecule.system.annotations.EventSink;
 
-
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Set;
 
-import static org.molecule.util.CollectionUtils.KV;
-import static org.molecule.util.CollectionUtils.MAP;
+import static org.molecule.util.CollectionUtils.*;
 
 public class Main1 {
 
@@ -43,13 +56,16 @@ public class Main1 {
 
         Sys compositeSystem = new SysBuilder(args)
                 .withAttributes(new ModuleInfo("test","1.0","test-vendor",MAP(KV("att1","something"))))
-                .withLifecycleManager(SimpleLifecycleManager.class)
+                //.withLifecycleManager(SimpleLifecycleManager.class)
                 .withOnStartup(StartupMain.class)
-                .withModules(new SomeNewModule(),
-                        new SomeOtherNewModule(new ModuleInfo("one","1.3.4","x",MAP())),
-                        new SomeOtherNewModule(new ModuleInfo("two","1.3.4","x",MAP())),
-                        new SomeOtherNewModule(new ModuleInfo("three","1.3.4","x",MAP())))
+                //.withModules(
+                //        new JLineInteractiveShellModule())
                 .build();
+
+
+       /* Sys compositeSystem = new SysBuilder(args)
+                .withAttributes(new ModuleInfo("simple","1.0","test-vendor",MAP(KV("att1","something"))))
+                .build();*/
 
         compositeSystem.start();
 
@@ -95,15 +111,22 @@ class SomeNewEventSink{
 class StartupMain implements OnStartup {
 
     Set<ModuleInfo> modules;
+    Shell shell;
 
     @Inject
-    StartupMain(@ModulesInfo Set<ModuleInfo> moduleInfoSet){
+    StartupMain(@ModulesInfo Set<ModuleInfo> moduleInfoSet,CommandLineShell shell)
+    {
         this.modules = moduleInfoSet;
+        this.shell = shell;
     }
 
     @Override
     public void onStart(String[] args){
-        log.info("Starting up System with argumenst ");
+
+
+        shell.start(args);
+
+        /*log.info("Starting up System with argumenst ");
         if(args != null && args.length > 0){
             for (String arg : args) {
                 log.info(arg);
@@ -118,7 +141,7 @@ class StartupMain implements OnStartup {
                 log.info("Module {}",module.getName());
             }
 
-        }
+        }*/
     }
 }
 
@@ -135,11 +158,10 @@ class ExitMain implements OnExit{
 
 class SomeNewModule extends AbstractModule {
 
-    @ProvidesIntoSet
-    @ModulesInfo
-    public ModuleInfo provideModuleInfo(){
-        return new ModuleInfo("SomeNewModule","1.2.0","abc-vendor",
-                MAP(KV("some-new-attribute","some-value")));
+
+    @Override
+    protected void configure() {
+        super.configure();
     }
 
     @ProvidesIntoSet
@@ -147,6 +169,7 @@ class SomeNewModule extends AbstractModule {
     public Object provideEventSink(){
         return new AnotherEventSink();
     }
+
 
 }
 
@@ -169,5 +192,14 @@ class SomeOtherNewModule extends AbstractModule{
     @EventSink
     public Object provideEventSink(){
         return new SomeNewEventSink(moduleInfo.getName());
+    }
+
+    @ProvidesIntoSet
+    @DomainOperations
+    public List<Operation> provideDomaiOperations(){
+        return LIST(Operation.class,
+                new SimpleOperation("domain3.testOperation2","function://simple/testFun2",""),
+                new SimpleOperation("domain3.subdomain1.testOperation3","function://simple/testFun3","")
+        );
     }
 }

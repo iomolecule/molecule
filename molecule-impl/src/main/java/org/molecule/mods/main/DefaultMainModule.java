@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 Vijayakumar Mohan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.molecule.mods.main;
 
 
@@ -5,36 +21,44 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import lombok.extern.slf4j.Slf4j;
-import org.cfg4j.source.ConfigurationSource;
+import org.molecule.config.CompositeConfigurationSource;
+import org.molecule.config.CompositeMsgConfigSource;
+import org.molecule.config.ConfigurationSource;
+import org.molecule.config.MsgConfigSource;
+import org.molecule.config.annotations.ConfigsSource;
+import org.molecule.config.annotations.DefaultConfigsSource;
+import org.molecule.config.annotations.MsgConfigsSource;
 import org.molecule.module.ModuleInfo;
+import org.molecule.module.MoleculeModule;
 import org.molecule.module.annotations.ModulesInfo;
-import org.molecule.system.LifecycleManager;
-import org.molecule.system.OnExit;
-import org.molecule.system.OnStartup;
-import org.molecule.system.annotations.AsyncEventBus;
-import org.molecule.system.annotations.EventSink;
-import org.molecule.system.annotations.MainArgs;
-import org.molecule.system.annotations.SyncEventBus;
+import org.molecule.system.*;
+import org.molecule.system.annotations.*;
+import org.molecule.system.services.DomainService;
 import org.molecule.system.services.EventsService;
+import org.molecule.system.services.FnBus;
 import org.molecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.molecule.util.CollectionUtils.KV;
 import static org.molecule.util.CollectionUtils.MAP;
 
 @Slf4j
-public class DefaultMainModule extends AbstractModule{
+public class DefaultMainModule extends MoleculeModule{
 
     private ModuleInfo systemInfo;
     private ConfigurationSource[] configSources;
@@ -71,6 +95,64 @@ public class DefaultMainModule extends AbstractModule{
         bindEventSinks();
 
         bindStartupAndExitInstances();
+
+        bindDomainOperations();
+
+        bindConfigsSources();
+
+        bindMsgConfigsSources();
+
+        bindFuns();
+
+        bindFunc();
+
+        bindLifecycleManagers();
+
+        initModule();
+
+        registerFuncs(ListAllFnsFunction.class);
+    }
+
+    private void bindLifecycleManagers() {
+
+        MapBinder<String, LifecycleManager> lifecycleManagerMapBinder =
+                MapBinder.newMapBinder(binder(), String.class, LifecycleManager.class,LifecycleManagers.class);
+
+        lifecycleManagerMapBinder.addBinding("main").to(MainLifecycleManager.class).in(Singleton.class);
+
+    }
+
+    private void bindMsgConfigsSources() {
+        Multibinder<ConfigurationSource> msgConfigSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                MsgConfigsSource.class);
+    }
+
+    private void bindFunc() {
+        Multibinder<Function<Param,Param>> funcSet = Multibinder.newSetBinder(binder(),new TypeLiteral<Function<Param,Param>>(){},
+                Func.class);
+
+    }
+
+    private void bindFuns() {
+        Multibinder<Fn> funs = Multibinder.newSetBinder(binder(),new TypeLiteral<Fn>(){},
+                Fun.class);
+
+        Multibinder<List<Fn>> funsList = Multibinder.newSetBinder(binder(),new TypeLiteral<List<Fn>>(){},
+                Funs.class);
+
+    }
+
+    private void bindConfigsSources() {
+        Multibinder<ConfigurationSource> configsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                ConfigsSource.class);
+        Multibinder<ConfigurationSource> defaultConfigsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
+                DefaultConfigsSource.class);
+
+    }
+
+    private void bindDomainOperations() {
+        Multibinder<List<Operation>> domainOperations = Multibinder.newSetBinder(binder(),new TypeLiteral<List<Operation>>(){},
+                DomainOperations.class);
     }
 
     private void bindStartupAndExitInstances() {
@@ -114,15 +196,6 @@ public class DefaultMainModule extends AbstractModule{
         bind(LifecycleManager.class).to(lifecycleManagerClass).in(Singleton.class);
     }
 
-    @ProvidesIntoSet
-    @ModulesInfo
-    public ModuleInfo provideSystemInfo(){
-        if(systemInfo != null){
-            return systemInfo;
-        }else{
-            return new ModuleInfo("Main","1.0.0","Molecule",MAP(KV("default",true)));
-        }
-    }
 
     @Provides
     @SyncEventBus
@@ -167,5 +240,37 @@ public class DefaultMainModule extends AbstractModule{
 
         return new SysLifecycleCallbackServiceImpl(startups,exits,mainArgs);
     }
+
+    @Provides
+    @Singleton
+    public DomainService provideDomain(@DomainOperations Set<List<Operation>> operationsSet){
+        log.info("OperationsSet {}",operationsSet);
+        return new DefaultDomainService(operationsSet);
+    }
+
+    @Provides
+    @Singleton
+    public ConfigurationSource provideCompositeConfigSource(
+            @DefaultConfigsSource Set<ConfigurationSource> defaultConfigurationSources,
+            @ConfigsSource Set<ConfigurationSource> configurationSources){
+        return new CompositeConfigurationSource(defaultConfigurationSources,configurationSources);
+    }
+
+    @Provides
+    @Singleton
+    public MsgConfigSource provideMessageConfigSource(@MsgConfigsSource Set<ConfigurationSource> messageConfigSources){
+        return new CompositeMsgConfigSource(messageConfigSources);
+    }
+
+    @Provides
+    @Singleton
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,@Func Set<Function<Param,Param>> functions, @AsyncEventBus EventBus eventBus,
+                                     MsgConfigSource msgConfigSource){
+
+        return new DefaultFnBus(fns,fnsList,functions,eventBus,msgConfigSource);
+    }
+
+
+
 
 }

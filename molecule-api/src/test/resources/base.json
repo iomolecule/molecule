@@ -1,0 +1,12 @@
+{
+  "test" : {
+    "simple" : {
+      "key1" : "value1",
+      "key2" : "value2"
+    },
+    "another" : [
+      "test1",
+      "test2"
+    ]
+  }
+}

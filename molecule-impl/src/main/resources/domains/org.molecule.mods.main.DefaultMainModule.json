@@ -1,0 +1,13 @@
+{
+  "system": {
+    "ls-fns": {
+      "uri": "function://system/main/listAllFnsFunction",
+      "doc": "List all Fns registered in the System"
+    },
+    "system-properties" : {
+      "uri" : "function://system/main/listSystemPropertiesFunction",
+      "doc" : "Lists all the system properties"
+    }
+  }
+}
+

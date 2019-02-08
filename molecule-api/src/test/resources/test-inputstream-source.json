@@ -1,0 +1,7 @@
+{
+  "simpleConfig" : {
+    "someValue" : 600,
+    "decafe" : "radical",
+    "notAvailableKey" : 56006
+  }
+}
