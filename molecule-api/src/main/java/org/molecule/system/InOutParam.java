@@ -22,6 +22,10 @@ import org.molecule.commons.Constants;
 
 import java.util.*;
 
+/**
+ * The default implementation of {@link org.molecule.system.Param}
+ * This class is widely used within Molecule as the default instance for Params.
+ */
 public class InOutParam implements Param {
 
     private PersistentMap<String,Object> delegate;

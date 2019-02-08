@@ -16,8 +16,16 @@
 
 package org.molecule.system;
 
+/**
+ * On Startup represents the extension point exposed by the services in Molecule System
+ * to get a call back when the system is starting up.
+ */
 public interface OnStartup {
 
+    /**
+     * Call back to inform the interested party of system startup.
+     * @param args The arguments passed when starting the system
+     */
     public void onStart(String[] args);
 
 }

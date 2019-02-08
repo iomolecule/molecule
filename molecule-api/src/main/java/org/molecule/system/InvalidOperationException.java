@@ -16,6 +16,9 @@
 
 package org.molecule.system;
 
+/**
+ * Represents an Invalid Operation in the Molecule Framework
+ */
 public class InvalidOperationException extends Exception{
 
     public InvalidOperationException() {

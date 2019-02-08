@@ -18,6 +18,6 @@
  * The core package of the Molecule system. This package holds the key interfaces , annotations and classes
  * which form the base of the Molecule Framework.
  *
- * @author vijayakumarmohan
+ * @author Vijayakumar Mohan
  */
 package org.molecule.system;

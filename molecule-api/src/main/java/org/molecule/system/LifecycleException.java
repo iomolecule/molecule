@@ -16,6 +16,9 @@
 
 package org.molecule.system;
 
+/**
+ * Represents the errors faced during the startup and shutdown of services within the Molecule framework
+ */
 public class LifecycleException extends Exception {
 
     public LifecycleException() {

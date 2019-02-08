@@ -22,16 +22,33 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- *
+ * The Fn interface represents a Function in the Molecule Framework.
+ * An Fn is uniquely identified by an {@link java.net.URI}.
+ * A Fn can provide information about the Input it expects from the caller / invoker.
+ * Similarly a Fn can provide information about the Output it provides based on the input from the caller / invoker.
+ * The input and output information is optional and required only if the user expects Molecule to automatically validate
+ * the presence of input and output
  */
 public interface Fn extends Function<Param,Param> {
 
+    /**
+     * Retrieve the URI of the Fn
+     * @return The URI of the Fn
+     */
     public URI getURI();
 
+    /**
+     * Retrieve the Output Declarations as a list
+     * @return The list of {@link org.molecule.system.ParamDeclaration} instances which the Fn is expected to provide as output.
+     */
     public default List<ParamDeclaration> getOutDeclarations(){
         return new ArrayList<>();
     }
 
+    /**
+     * Retrieve the Input declarations as a list
+     * @return The list of {@link org.molecule.system.ParamDeclaration} instances which the Fn expects as input when invoked.
+     */
     public default List<ParamDeclaration> getInDeclarations(){
         return new ArrayList<>();
     }

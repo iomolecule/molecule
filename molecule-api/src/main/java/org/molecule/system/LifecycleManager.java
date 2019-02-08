@@ -16,9 +16,22 @@
 
 package org.molecule.system;
 
+/**
+ * The LifecycleManager represents concept of a component which is responsible for handling lifecycle of a set of services
+ * within the Molecule Framework.
+ * In Molecule the LifecycleManager's can be logically composed to form higher level lifecycle manager instances which
+ * is used to build on top of existing lifecycle managers provided within Molecule
+ */
 public interface LifecycleManager {
 
+    /**
+     * Intiates the start event of the LifecycleManager
+     * @throws LifecycleException The exception thrown when error occur during system startup
+     */
     public void start()throws LifecycleException;
 
+    /**
+     * Initiates the stop event of the LifecycleManager
+     */
     public void stop();
 }
