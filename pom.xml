@@ -35,6 +35,24 @@
         <cfg4j.version>4.4.1</cfg4j.version>
     </properties>
 
+    <name>Molecule Framework</name>
+    <description>Molecule Java framework for building software systems</description>
+    <url>https://github.com/bogie-clj/molecule</url>
+
+    <developers>
+        <developer>
+            <name>Vijayakumar Mohan</name>
+            <email>vijayakumar.mohan@outlook.com</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <distributionManagement>
         <snapshotRepository>
