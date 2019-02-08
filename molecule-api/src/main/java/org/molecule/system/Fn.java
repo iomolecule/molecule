@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ *
+ */
 public interface Fn extends Function<Param,Param> {
 
     public URI getURI();
