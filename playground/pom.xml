@@ -31,10 +31,12 @@
         <dependency>
             <groupId>com.github.bogie-clj</groupId>
             <artifactId>molecule-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.bogie-clj</groupId>
             <artifactId>molecule-impl</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
