@@ -16,11 +16,26 @@
 
 package org.molecule.system;
 
+/**
+ * Abstraction of a System in Molecule.
+ *
+ */
 public interface Sys {
 
+    /**
+     * Method invoked by  the caller to start the 'system'
+     * @throws LifecycleException Exception thrown when errors occur during system startup
+     */
     void start() throws LifecycleException;
 
+    /**
+     * Retrieves whether the Sys is started or not
+     * @return Flag indicating the started status of a Sys
+     */
     boolean isStarted();
 
+    /**
+     * Issues a stop signal when the Sys needs to be stopped
+     */
     void stop();
 }

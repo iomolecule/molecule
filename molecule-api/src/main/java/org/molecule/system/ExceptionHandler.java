@@ -16,8 +16,16 @@
 
 package org.molecule.system;
 
+/**
+ * ExceptionHandler interface is used within the Molecule framework as an instance to handle all unhandled exceptions in the molecule system.
+ *
+ */
 public interface ExceptionHandler {
 
+    /**
+     * Handles the Throwable specified
+     * @param throwable The throwable specified which should be handled appropriately
+     */
     public void handle(Throwable throwable);
 
 }

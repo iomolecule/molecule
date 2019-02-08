@@ -18,6 +18,9 @@ package org.molecule.system;
 
 import lombok.Value;
 
+/**
+ * The Default implementation of {@link org.molecule.system.ParamDeclaration}
+ */
 @Value
 public class DefaultParamDeclaration implements ParamDeclaration{
 

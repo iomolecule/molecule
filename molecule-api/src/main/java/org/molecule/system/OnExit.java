@@ -16,7 +16,14 @@
 
 package org.molecule.system;
 
+/**
+ * On Exit represents the extension point exposed by the services in Molecule system
+ * to get a call back when the system is exiting.
+ */
 public interface OnExit {
 
+    /**
+     * Call back method to inform of system exiting.
+     */
     public void onExit();
 }

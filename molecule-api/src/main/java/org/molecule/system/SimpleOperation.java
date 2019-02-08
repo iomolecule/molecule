@@ -21,6 +21,9 @@ import java.net.URISyntaxException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Default implementation of {@link org.molecule.system.Operation}
+ */
 public class SimpleOperation implements Operation{
 
     private String name;

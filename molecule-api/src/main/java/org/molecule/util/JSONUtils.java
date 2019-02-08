@@ -37,8 +37,9 @@ public class JSONUtils {
     /**
      * Merge two JSON tree into one i.e mergedInTo.
      *
-     * @param toBeMerged
-     * @param mergedInTo
+     * @param toBeMerged The jsonnode to be merged
+     * @param mergedInTo The jsonnode to be merged into
+     * @param throwErrorOnIncompatibleTypes Flag to indicate whether to throw error on incompatible types when merging.
      */
     public static void merge(JsonNode toBeMerged, JsonNode mergedInTo,boolean throwErrorOnIncompatibleTypes) {
         Iterator<Map.Entry<String, JsonNode>> incomingFieldsIterator = toBeMerged.fields();

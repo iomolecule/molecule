@@ -18,14 +18,34 @@ package org.molecule.system;
 
 import java.net.URI;
 
+/**
+ * An Operation represents the operation within the domain.
+ */
 public interface Operation {
 
+    /**
+     * The Name of the operation
+     * @return The name of the operation
+     */
     public String getName();
 
+    /**
+     * Retrieve the Fn URI pointed to by the Operation
+     * @return The URI of the Function (fn)
+     */
     public URI getFunctionURI();
 
+    /**
+     * A brief documentation of the Operation
+     * @return The String representing the documentation or help information about the operation
+     */
     public String getDoc();
 
+    /**
+     * Retrieves the simple name of an Operation
+     *
+     * @return Retrieves the simple name of the Operation
+     */
     public String getSimpleName();
 
 }
