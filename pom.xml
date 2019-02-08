@@ -15,15 +15,13 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.bogie-clj</groupId>
     <artifactId>molecule</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <modules>
         <module>molecule-api</module>
         <module>molecule-impl</module>
@@ -52,7 +50,7 @@
         <connection>scm:git:git://github.com/bogie-clj/molecule.git</connection>
         <developerConnection>scm:git:git@github.com:bogie-clj/molecule.git</developerConnection>
         <url>https://github.com/bogie-clj/molecule</url>
-        <tag>HEAD</tag>
+        <tag>molecule-0.1.0</tag>
     </scm>
 
     <dependencyManagement>
@@ -323,7 +321,7 @@
                         <verbose>true</verbose>
                         <Xlint>ignore</Xlint>
                         <encoding>UTF-8</encoding>
-                        <sources/>
+                        <sources />
                         <weaveDirectories>
                             <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
                         </weaveDirectories>
