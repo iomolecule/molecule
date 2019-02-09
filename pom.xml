@@ -25,7 +25,7 @@
     <modules>
         <module>molecule-api</module>
         <module>molecule-impl</module>
-        <module>playground</module>
+        <!--module>playground</module-->
     </modules>
 
     <properties>
