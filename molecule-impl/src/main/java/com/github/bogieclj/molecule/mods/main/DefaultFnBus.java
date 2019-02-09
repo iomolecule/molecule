@@ -158,7 +158,7 @@ class DefaultFnBus implements FnBus{
     @Override
     public Param apply(Param param) {
         if(param.containsKey(FUNCTION_TO_INVOKE)){
-            //log.info("Function To Invoke {}",param.get(FUNCTION_TO_INVOKE));
+            //log.debug("Function To Invoke {}",param.get(FUNCTION_TO_INVOKE));
             return handleFunctionCall((URI)param.get(FUNCTION_TO_INVOKE),param);
         }else{
             return handleError(ERROR_NO_FUNCTION_TO_INVOKE_SPECIFIED,param);
@@ -184,7 +184,7 @@ class DefaultFnBus implements FnBus{
 
     private Param handleFunctionCall(URI funURI,
                                      Param param) {
-        //log.info("Checking FunURI {}",funURI);
+        //log.debug("Checking FunURI {}",funURI);
         if(fnMap.containsKey(funURI)){
             Fn fnToInvoke = fnMap.get(funURI);
             try {
@@ -192,10 +192,10 @@ class DefaultFnBus implements FnBus{
                 // type mismatching from what is expected
                 param = FnUtils.verifyInParams(param,fnToInvoke.getInDeclarations());
                 Param outParam = fnToInvoke.apply(param);
-                //log.info("Out Param {}",outParam);
+                //log.debug("Out Param {}",outParam);
                 //verify whether the out going parameters are valid and provided as promised by the fn
                 //any mismatch or missing parameters against the one declared by the Fn a runtime exception is thrown
-                //log.info("Out Params {}",fnToInvoke.getOutDeclarations());
+                //log.debug("Out Params {}",fnToInvoke.getOutDeclarations());
                 outParam = FnUtils.mapOutParams(outParam,fnToInvoke.getOutDeclarations(), Constants.OUT_PARAMS);
                 return outParam;
             }catch(Exception e){
@@ -245,7 +245,7 @@ class DefaultFnBus implements FnBus{
                 List<Fn> listOfFns = getListOfFnsFromFunctions(functionSet);
 
                 for (Fn fn : listOfFns) {
-                    log.info("Processing Fn {}",fn.getURI());
+                    log.debug("Processing Fn {}",fn.getURI());
                     fnMap.put(fn.getURI(),fn);
                 }
 

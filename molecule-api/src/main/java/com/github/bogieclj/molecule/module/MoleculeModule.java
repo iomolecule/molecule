@@ -78,7 +78,7 @@ public abstract class MoleculeModule extends AbstractModule{
                         new InputStreamConfigurationSource(false,true,resourceAsStream);
                 registerConfigSource(inputStreamConfigurationSource);
             }else{
-                log.info("Unable to find default config file {} in classpath!",configFile);
+                log.debug("Unable to find default config file {} in classpath!",configFile);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public abstract class MoleculeModule extends AbstractModule{
                                 resourceAsStream);
                 registerMsgConfigSource(inputStreamMsgConfigSource);
             }else{
-                log.info("Unable to find default message config file {} in classpath!",msgConfigFile);
+                log.debug("Unable to find default message config file {} in classpath!",msgConfigFile);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,10 +123,10 @@ public abstract class MoleculeModule extends AbstractModule{
         try(InputStream resourceAsStream = getClass().getResourceAsStream(moduleInfoFile)){
             if(resourceAsStream != null){
                 ModuleInfo moduleInfo = JSONUtils.OBJECT_MAPPER.readValue(resourceAsStream, ModuleInfo.class);
-                log.info("Registering Module {}",moduleInfo);
+                log.debug("Registering Module {}",moduleInfo);
                 registerSystemInfo(moduleInfo);
             }else{
-                log.info("Unable to find default module info file {} in classpath!",moduleInfoFile);
+                log.debug("Unable to find default module info file {} in classpath!",moduleInfoFile);
             }
         } catch (IOException e) {
             e.printStackTrace();

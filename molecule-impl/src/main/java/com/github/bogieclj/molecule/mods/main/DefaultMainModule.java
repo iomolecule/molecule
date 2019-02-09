@@ -189,7 +189,7 @@ public class DefaultMainModule extends MoleculeModule{
     }
 
     private void bindLifecycleManager() {
-        log.info("Binding LifecycleManager to {}",lifecycleManagerClass);
+        log.debug("Binding LifecycleManager to {}",lifecycleManagerClass);
         //bind the lifecycle manager class in singleton scope
         bind(LifecycleManager.class).to(lifecycleManagerClass).in(Singleton.class);
     }
@@ -226,7 +226,7 @@ public class DefaultMainModule extends MoleculeModule{
                                                              @AsyncEventBus EventBus asyncEventBus,
                                                              @EventSink Set<Object> eventSinksSet){
 
-        log.info("EventSinkSet {}",eventSinksSet);
+        log.debug("EventSinkSet {}",eventSinksSet);
         return new EventsServiceImpl(syncEventBus,asyncEventBus,eventSinksSet.toArray());
     }
 
@@ -242,7 +242,7 @@ public class DefaultMainModule extends MoleculeModule{
     @Provides
     @Singleton
     public DomainService provideDomain(@DomainOperations Set<List<Operation>> operationsSet){
-        log.info("OperationsSet {}",operationsSet);
+        log.debug("OperationsSet {}",operationsSet);
         return new DefaultDomainService(operationsSet);
     }
 

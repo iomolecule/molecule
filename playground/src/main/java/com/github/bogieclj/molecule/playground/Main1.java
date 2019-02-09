@@ -80,7 +80,7 @@ class TestEventSink{
 
     @Subscribe
     public void subscribeToLifecycleEvents(String event){
-      log.info("Received event {}",event);
+      log.debug("Received event {}",event);
     }
 
 }
@@ -90,7 +90,7 @@ class AnotherEventSink{
 
     @Subscribe
     public void subscribeToLifecycleEvents(String event){
-        log.info("Received event {}",event);
+        log.debug("Received event {}",event);
     }
 
 }
@@ -103,7 +103,7 @@ class SomeNewEventSink{
 
     @Subscribe
     public void subscription(String event){
-        log.info("{} Received Event {}",name,event);
+        log.debug("{} Received Event {}",name,event);
     }
 }
 
@@ -126,19 +126,19 @@ class StartupMain implements OnStartup {
 
         shell.start(args);
 
-        /*log.info("Starting up System with argumenst ");
+        /*log.debug("Starting up System with argumenst ");
         if(args != null && args.length > 0){
             for (String arg : args) {
-                log.info(arg);
+                log.debug(arg);
             }
 
         }
 
-        log.info("Registed Modules in the system..");
+        log.debug("Registed Modules in the system..");
 
         if(modules!= null && modules.size() > 0){
             for (ModuleInfo module : modules) {
-                log.info("Module {}",module.getName());
+                log.debug("Module {}",module.getName());
             }
 
         }*/
@@ -151,7 +151,7 @@ class ExitMain implements OnExit{
 
     @Override
     public void onExit() {
-        log.info("About to exit the system");
+        log.debug("About to exit the system");
     }
 }
 

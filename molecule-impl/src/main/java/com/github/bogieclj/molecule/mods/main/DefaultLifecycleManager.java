@@ -39,7 +39,7 @@ class DefaultLifecycleManager implements LifecycleManager{
 
     @Override
     public void start() throws LifecycleException {
-        log.info("Starting default lifecycle behaviour");
+        log.debug("Starting default lifecycle behaviour");
 
 
         //first start the main lifecycle manager so that base framework services are started in order
@@ -51,7 +51,7 @@ class DefaultLifecycleManager implements LifecycleManager{
     @Override
     public void stop() {
         if(started){
-            log.info("Stopping default lifecycle behaviour");
+            log.debug("Stopping default lifecycle behaviour");
 
             //first start the main lifecycle manager so that base framework services are started in order
 

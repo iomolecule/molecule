@@ -44,7 +44,7 @@ public class DomainServiceTests {
 
         Operation operation = domainService.getOperation("commercial.accounts.view");
 
-        log.info("Operation Commercial accounts {}",operation);
+        log.debug("Operation Commercial accounts {}",operation);
 
         domainService.stop();
 
@@ -61,7 +61,7 @@ public class DomainServiceTests {
 
         //Operation operation = domainService.getOperation("commercial.accounts.view");
 
-        //log.info("Operation Commercial accounts {}",operation);
+        //log.debug("Operation Commercial accounts {}",operation);
 
         boolean validOperation = domainService.isValidOperation("common.usermanagement.addUser");
         assertTrue(validOperation);

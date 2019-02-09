@@ -54,7 +54,7 @@ public class CommandLineShell implements Shell{
 
         Options options = CommandLine.populateCommand(new Options(), args);
 
-        log.info("{}",options);
+        log.debug("{}",options);
 
         List<Operation> allOperations = domainService.getAllOperations();
 

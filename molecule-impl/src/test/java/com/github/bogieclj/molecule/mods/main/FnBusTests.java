@@ -43,13 +43,13 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -60,14 +60,14 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
         in = in.plus(Constants.FUNCTION_TO_INVOKE,new URI("function://fn1"));
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -78,14 +78,14 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
         in = in.plus(Constants.FUNCTION_TO_INVOKE,new URI("function://fn4"));
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -96,14 +96,14 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
         in = in.plus(Constants.FUNCTION_TO_INVOKE,new URI("function://throw-exception-fn"));
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -114,14 +114,14 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
         in = in.plus(Constants.FUNCTION_TO_INVOKE,new URI("function://throw-exception-fn2"));
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -132,7 +132,7 @@ public class FnBusTests {
         fnBus.start();
 
         fnBus.forEach(fn -> {
-            log.info("Fn {} registered...",fn.getURI());
+            log.debug("Fn {} registered...",fn.getURI());
         });
 
         Param in = new InOutParam();
@@ -141,7 +141,7 @@ public class FnBusTests {
         in = in.plus("b",200);
         Param out = fnBus.apply(in);
 
-        log.info("Out : {}",out);
+        log.debug("Out : {}",out);
         fnBus.stop();
     }
 
@@ -175,7 +175,7 @@ class Fn1 implements Fn{
 
     @Override
     public Param apply(Param param) {
-        log.info("apply called");
+        log.debug("apply called");
         param = param.plus("response","inside fn1");
         return param;
     }
@@ -196,7 +196,7 @@ class Fn2 implements Fn{
 
     @Override
     public Param apply(Param param) {
-        log.info("apply called");
+        log.debug("apply called");
         param = param.plus("response","inside fn2");
         return param;
     }
@@ -218,7 +218,7 @@ class ThrowExceptionFn implements Fn{
     @Override
     public Param apply(Param param) {
 
-        log.info("About to throw runtime exception...");
+        log.debug("About to throw runtime exception...");
 
         throw new RuntimeException("Some random exception..");
 
@@ -241,7 +241,7 @@ class ThrowExceptionFn2 implements Fn{
     @Override
     public Param apply(Param param) {
 
-        log.info("About to throw runtime exception...");
+        log.debug("About to throw runtime exception...");
 
         throw new RuntimeException("throw-exception-fn2-message");
 

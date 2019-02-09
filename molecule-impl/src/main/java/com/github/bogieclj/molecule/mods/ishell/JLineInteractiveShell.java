@@ -149,10 +149,10 @@ class JLineInteractiveShell implements Shell{
         if(rootOperationList.contains(command)){
             String commandPath = fullyQualifiedCurrentDomain.isEmpty() == false ? fullyQualifiedCurrentDomain + "." +command : command;
             Operation operation = domainService.getOperation(commandPath);
-            //log.info("Operation {}",operation);
+            //log.debug("Operation {}",operation);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
-            //log.info("In Params {}",inParam);
+            //log.debug("In Params {}",inParam);
             Param outParam = fnBus.apply(inParam);
             if(outParam.hasOutParams()){
                 prettyPrintOutput(outParam);
@@ -178,7 +178,7 @@ class JLineInteractiveShell implements Shell{
             if(outParam.hasOutParams()){
                 prettyPrintOutput(outParam);
             }
-            //log.info("Received Out {}",outParam);
+            //log.debug("Received Out {}",outParam);
         }else{
             throw new InvalidOperationException(String.format("Operation %s is invalid for domain %s",command,"/"));
         }
@@ -324,8 +324,8 @@ class JLineInteractiveShell implements Shell{
             operationParams = args.get(1);
         }
 
-        log.info("Operation {}",operationName);
-        log.info("Params {}",operationParams);
+        log.debug("Operation {}",operationName);
+        log.debug("Params {}",operationParams);
 
         String fullyQualifiedDomainName = getFullyQualifiedDomain(domainStack);
 
@@ -333,10 +333,10 @@ class JLineInteractiveShell implements Shell{
             printf("No such operation '%s' found under '%s'",operationName,getPrompt(domainStack,""));
         }else{
             if(operationParams != null) {
-                //log.info("PREQUOTE IN {}", operationParams);
+                //log.debug("PREQUOTE IN {}", operationParams);
                 //String opParams = quoteParams(operationParams);
                 String opParams = unQuoteParams(operationParams);
-                //log.info("MVEL IN {}", opParams);
+                //log.debug("MVEL IN {}", opParams);
 
                 Object expressionObj = MVEL.eval(opParams);
                 printf("Params %s, %s", expressionObj.getClass(), expressionObj);
@@ -452,14 +452,14 @@ class JLineInteractiveShell implements Shell{
 
     private void listOps(List<String> args) {
         String fullyQualifiedDomain = getFullyQualifiedDomain(domainStack);
-        //log.info("FCN {}",fullyQualifiedDomain);
+        //log.debug("FCN {}",fullyQualifiedDomain);
         List<String> operationsAt = domainService.getOperationsAt(fullyQualifiedDomain);
         printf("%s",operationsAt);
     }
 
     private void listDomains(List<String> args) {
         String fullyQualifiedDomain = getFullyQualifiedDomain(domainStack);
-        //log.info("FCN {}",fullyQualifiedDomain);
+        //log.debug("FCN {}",fullyQualifiedDomain);
         List<String> domainNamesAt = domainService.getDomainNamesAt(fullyQualifiedDomain);
         printf("%s",domainNamesAt);
     }

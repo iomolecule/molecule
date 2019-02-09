@@ -57,7 +57,7 @@ class DefaultDomainService implements DomainService {
                 for (List<Operation> operations : operationsSet) {
                     for (Operation operation : operations) {
                         if (domainTree.getObject(operation.getName(), null) == null) {
-                            log.info("Adding operation {}",operation);
+                            log.debug("Adding operation {}",operation);
 
                             domainTree.putObject(operation.getName(), operation);
                         } else {
@@ -70,7 +70,7 @@ class DefaultDomainService implements DomainService {
             started = true;
         }
 
-        log.info("Registered Domains \n {}",domainTree);
+        log.debug("Registered Domains \n {}",domainTree);
     }
 
     @Override
@@ -98,7 +98,7 @@ class DefaultDomainService implements DomainService {
         if(tree != null){
             Object asObject = tree.asObject();
             Object newObj = domainTree.getObject(path,noOp);
-            log.info("Operation @ {} is {} , new Obj {}",path,asObject,newObj);
+            log.debug("Operation @ {} is {} , new Obj {}",path,asObject,newObj);
         }*/
         return domainTree.getObject(path,noOp);
     }

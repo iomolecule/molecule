@@ -63,7 +63,7 @@ class MainLifecycleManager implements LifecycleManager{
         //register the event sinks first
         if(eventSinkRegistrationService.hasAnyEventSinks()){
             for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {
-                log.info("Registering event sink {}",eventSink);
+                log.debug("Registering event sink {}",eventSink);
             }
             eventSinkRegistrationService.registerEventSinks();
         }
@@ -76,7 +76,7 @@ class MainLifecycleManager implements LifecycleManager{
 
         eventBus.post("FNBUS_STARTED");
 
-        log.info("Starting domain service...");
+        log.debug("Starting domain service...");
 
         eventBus.post("DOMAIN_SERVICE_STARTING");
 
@@ -84,9 +84,9 @@ class MainLifecycleManager implements LifecycleManager{
 
         eventBus.post("DOMAIN_SERVICE_STARTED");
 
-        log.info("Registered Domains..");
+        log.debug("Registered Domains..");
 
-        log.info("Starting lifecycle of services...");
+        log.debug("Starting lifecycle of services...");
 
 
 
@@ -107,14 +107,14 @@ class MainLifecycleManager implements LifecycleManager{
         log.debug("Stopping main framework services...");
 
         if(started) {
-            log.info("Stop lifecycle of services...");
+            log.debug("Stop lifecycle of services...");
 
 
             eventBus.post("STOPPING_SYS");
 
             if (eventSinkRegistrationService.hasAnyEventSinks()) {
                 for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {
-                    log.info("UnRegistering event sink {}", eventSink);
+                    log.debug("UnRegistering event sink {}", eventSink);
                 }
                 eventSinkRegistrationService.unRegisterEventSinks();
             }
@@ -124,7 +124,7 @@ class MainLifecycleManager implements LifecycleManager{
             domainService.stop();
 
             fnBus.stop();
-            log.info("Sys Stop completed...");
+            log.debug("Sys Stop completed...");
             started = false;
         }
     }

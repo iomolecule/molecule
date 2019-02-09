@@ -65,19 +65,19 @@ public class SimpleLifecycleManager implements LifecycleManager{
         //register the event sinks first
         if(eventSinkRegistrationService.hasAnyEventSinks()){
             for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {
-                log.info("Registering event sink {}",eventSink);
+                log.debug("Registering event sink {}",eventSink);
             }
             eventSinkRegistrationService.registerEventSinks();
         }
 
         fnBus.start();
 
-        log.info("Starting domain service...");
+        log.debug("Starting domain service...");
         domainService.start();
 
-        log.info("Registered Domains..");
+        log.debug("Registered Domains..");
 
-        log.info("Starting lifecycle of services...");
+        log.debug("Starting lifecycle of services...");
 
 
 
@@ -92,11 +92,11 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
         started = true;
 
-        log.info("Starting Interactive Shell...");
+        log.debug("Starting Interactive Shell...");
 
         interactiveShell.start(new String[0]);
 
-        log.info("Done starting interactive Shell...");
+        log.debug("Done starting interactive Shell...");
 
     }
 
@@ -104,7 +104,7 @@ public class SimpleLifecycleManager implements LifecycleManager{
     public void stop() {
 
         if(started) {
-            log.info("Stop lifecycle of services...");
+            log.debug("Stop lifecycle of services...");
 
 
             eventBus.post("STOPPING_SYS");
@@ -113,7 +113,7 @@ public class SimpleLifecycleManager implements LifecycleManager{
 
             if (eventSinkRegistrationService.hasAnyEventSinks()) {
                 for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {
-                    log.info("UnRegistering event sink {}", eventSink);
+                    log.debug("UnRegistering event sink {}", eventSink);
                 }
                 eventSinkRegistrationService.unRegisterEventSinks();
             }
@@ -121,7 +121,7 @@ public class SimpleLifecycleManager implements LifecycleManager{
             sysLifecycleCallbackService.invokeAllExitCallbacks();
 
             fnBus.stop();
-            log.info("Sys Stop completed...");
+            log.debug("Sys Stop completed...");
             started = false;
         }
     }

@@ -70,7 +70,7 @@ class DefaultSys implements Sys{
     @Override
     public void stop() {
         if(started) {
-            log.info("Stopping Sys...");
+            log.debug("Stopping Sys...");
             getLifecycleManager().stop();
             started = false;
         }

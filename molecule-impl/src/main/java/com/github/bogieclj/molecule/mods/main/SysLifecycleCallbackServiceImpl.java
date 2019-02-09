@@ -40,7 +40,7 @@ class SysLifecycleCallbackServiceImpl implements SysLifecycleCallbackService{
 
     @Override
     public void invokeAllStartupCallbacks() {
-      log.info("Invoking all Startup callbacks...{}",onStartups);
+      log.debug("Invoking all Startup callbacks...{}",onStartups);
       if(onStartups != null && onStartups.size() > 0){
           for (OnStartup onStartup : onStartups) {
               onStartup.onStart(optionalMainArgs.orElse(new String[0]));
@@ -51,7 +51,7 @@ class SysLifecycleCallbackServiceImpl implements SysLifecycleCallbackService{
 
     @Override
     public void invokeAllExitCallbacks() {
-        log.info("Invoking all Exit callbacks...{}",onExits);
+        log.debug("Invoking all Exit callbacks...{}",onExits);
         if(onExits != null && onExits.size() > 0){
             for (OnExit onExit : onExits) {
                 onExit.onExit();
