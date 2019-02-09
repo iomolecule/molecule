@@ -21,7 +21,7 @@
     <groupId>com.github.bogie-clj</groupId>
     <artifactId>molecule</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.2</version>
+    <version>0.1.3-SNAPSHOT</version>
     <modules>
         <module>molecule-api</module>
         <module>molecule-impl</module>
@@ -69,7 +69,7 @@
         <connection>scm:git:git://github.com/bogie-clj/molecule.git</connection>
         <developerConnection>scm:git:git@github.com:bogie-clj/molecule.git</developerConnection>
         <url>https://github.com/bogie-clj/molecule</url>
-        <tag>molecule-0.1.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
