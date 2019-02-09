@@ -65,13 +65,15 @@ public class DefaultMainModule extends MoleculeModule{
     private Class<? extends OnExit>[] exitClazzes;
     private Object[] eventSinks;
     private String[] mainArgs;
+    private OnStartup[] onStartupInstances;
+    private OnExit[] onExitInstances;
 
     public DefaultMainModule(ModuleInfo moduleInfo,
                              ConfigurationSource[] configurationSources,
                              Class<? extends LifecycleManager> lifecycleManagerClazz,
                              Object[] eventSinks, String[] mainArgs,
                              Class<? extends OnStartup>[] startupclzes,
-                             Class<? extends OnExit>[] onexitClzes) {
+                             Class<? extends OnExit>[] onexitClzes,OnStartup[] onStartupInstances,OnExit[] onExitInstances) {
         checkArgument(moduleInfo != null,"ModuleInfo cannot be null or empty!");
         checkArgument(lifecycleManagerClazz != null, "Lifecycle Manager class cannot be null or empty!");
         this.systemInfo = moduleInfo;
@@ -81,6 +83,8 @@ public class DefaultMainModule extends MoleculeModule{
         this.mainArgs = mainArgs;
         this.startupClazzes = startupclzes;
         this.exitClazzes = onexitClzes;
+        this.onStartupInstances = onStartupInstances;
+        this.onExitInstances = onExitInstances;
     }
 
     @Override
@@ -162,6 +166,13 @@ public class DefaultMainModule extends MoleculeModule{
 
         }
 
+        if(onStartupInstances != null && onStartupInstances.length > 0){
+            for (OnStartup onStartupInstance : onStartupInstances) {
+                onStartupMultibinder.addBinding().toInstance(onStartupInstance);
+            }
+
+        }
+
         Multibinder<OnExit> onExitMultibinder = Multibinder.newSetBinder(binder(),OnExit.class);
         if(exitClazzes != null && exitClazzes.length >0){
             for (Class<? extends OnExit> exitClazz : exitClazzes) {
@@ -169,6 +180,14 @@ public class DefaultMainModule extends MoleculeModule{
             }
 
         }
+
+        if(onExitInstances != null && onExitInstances.length > 0){
+            for (OnExit onExitInstance : onExitInstances) {
+                onExitMultibinder.addBinding().toInstance(onExitInstance);
+            }
+
+        }
+
   }
 
     private void bindMainArgs() {

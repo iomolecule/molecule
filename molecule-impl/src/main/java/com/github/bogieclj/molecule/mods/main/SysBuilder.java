@@ -29,12 +29,13 @@ import com.github.bogieclj.molecule.system.Sys;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.bogieclj.molecule.util.CollectionUtils.MAP;
 import static com.google.common.base.Preconditions.checkArgument;
 
 
 public class SysBuilder {
 
-    private ModuleInfo moduleInfo;
+    private ModuleInfo moduleInfo = ModuleInfo.createModuleInfo("molecule","1.0.0","bogie-clj",MAP());
     private ConfigurationSource[] configurationSources;
     private Module[] modules;
     private Class<? extends LifecycleManager> lifecycleManagerClazz = DefaultLifecycleManager.class;
@@ -42,6 +43,8 @@ public class SysBuilder {
     private String[] args;
     private Class<? extends OnStartup>[] onStartupClasses;
     private Class<? extends OnExit>[] onExitClasses;
+    private OnStartup[] onStartupInstances;
+    private OnExit[] onExitInstances;
 
     public SysBuilder(){
         this(null);
@@ -120,7 +123,7 @@ public class SysBuilder {
                         eventSinks,
                         args,
                         onStartupClasses,
-                        onExitClasses)
+                        onExitClasses,onStartupInstances,onExitInstances)
         };
     }
 
@@ -129,6 +132,15 @@ public class SysBuilder {
         return this;
     }
 
+    public SysBuilder withOnStartupInst(OnStartup... onStartupInstances){
+        this.onStartupInstances = onStartupInstances;
+        return this;
+    }
+
+    public SysBuilder withOnExitInst(OnExit... onExitInstances){
+        this.onExitInstances = onExitInstances;
+        return this;
+    }
 
     public SysBuilder withOnExit(Class<? extends OnExit>... exitMainClasses) {
         this.onExitClasses = exitMainClasses;
