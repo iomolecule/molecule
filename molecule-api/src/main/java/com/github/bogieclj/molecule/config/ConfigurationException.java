@@ -16,6 +16,7 @@
 
 package com.github.bogieclj.molecule.config;
 
+
 public class ConfigurationException extends Exception{
 
     public ConfigurationException() {

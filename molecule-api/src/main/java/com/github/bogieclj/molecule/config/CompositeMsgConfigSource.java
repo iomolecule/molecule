@@ -19,6 +19,10 @@ package com.github.bogieclj.molecule.config;
 
 import java.util.Set;
 
+/**
+ * This configuration source implementation provides the ability to compose multiple message configuration sources
+ * in to a single logical message configuration source
+ */
 public class CompositeMsgConfigSource extends CompositeConfigurationSource implements MsgConfigSource{
 
     public CompositeMsgConfigSource(Set<ConfigurationSource> msgConfigSources) {

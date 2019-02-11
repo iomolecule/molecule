@@ -55,6 +55,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.github.bogieclj.molecule.util.CollectionUtils.KV;
 import static com.github.bogieclj.molecule.util.CollectionUtils.MAP;
 
+/**
+ * The Main Module implementation in the Molecule Framework.
+ *
+ */
 @Slf4j
 public class DefaultMainModule extends MoleculeModule{
 

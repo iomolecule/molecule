@@ -16,5 +16,8 @@
 
 package com.github.bogieclj.molecule.config;
 
+/**
+ * A classification of Message configuration compared to the Configuration Source
+ */
 public interface MsgConfigSource extends ConfigurationSource{
 }

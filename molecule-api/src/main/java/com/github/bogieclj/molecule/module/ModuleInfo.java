@@ -22,6 +22,13 @@ import lombok.Value;
 
 import java.util.Map;
 
+/**
+ * A simple data structure to allow modules in the Molecule system to register information about themselves.
+ * ModuleInfo instances are immutable once they are created.
+ *
+ * To support creation of ModuleInfo objects at runtime , for e.g. loading module info from json files,
+ * a Factory method is provided to enable creating module instances on the fly.
+ */
 @Value
 public class ModuleInfo {
 
@@ -31,6 +38,14 @@ public class ModuleInfo {
     private Map<String,Object> attributes;
 
 
+    /**
+     * A Factory method to allow creating ModuleInfo instances
+     * @param name
+     * @param version
+     * @param vendor
+     * @param attributes
+     * @return
+     */
     @JsonCreator
     public static ModuleInfo createModuleInfo(@JsonProperty("name") String name,
                                               @JsonProperty("version") String version,

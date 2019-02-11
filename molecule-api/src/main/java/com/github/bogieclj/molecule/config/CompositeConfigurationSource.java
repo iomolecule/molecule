@@ -19,6 +19,9 @@ package com.github.bogieclj.molecule.config;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * This configuration source implementation provides the ability to compose multiple configuration sources in to a single logical source
+ */
 public class CompositeConfigurationSource implements ConfigurationSource{
 
     private Set<ConfigurationSource> configurationSources;

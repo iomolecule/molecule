@@ -28,12 +28,26 @@ import java.io.InputStream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.github.bogieclj.molecule.util.JSONUtils.merge;
 
+/**
+ * A simple InputStream based ConfigurationSource Implementation.
+ * This implementation allows multiple input streams to be composed as a singe configuration source instance.
+ *
+ * The current implementation only supports 'JSON' streams.
+ * Internally the inputstreams are loaded as JSON nodes and they are logically merged in to a singe JSON node tree.
+ * The order of merge is as per the order of the input streams.
+ */
 @Slf4j
 public class InputStreamConfigurationSource implements ConfigurationSource{
 
     private JsonNode rootNode;
     private ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    /**
+     * Constructor for InputStreamConfigurationSource
+     * @param allowNullStreams Configuration to specify whether the implementation will allow the passing of null inputstreams
+     * @param throwErrorOnMismatchedTypes Configuration to specify whether the error should be thrown on mismatch of data types during merge of input stream content
+     * @param inputStreams The array of input streams to be merged
+     */
     public InputStreamConfigurationSource(boolean allowNullStreams,boolean throwErrorOnMismatchedTypes,InputStream... inputStreams){
 
         JsonNode configRootNode = null;
@@ -93,7 +107,6 @@ public class InputStreamConfigurationSource implements ConfigurationSource{
 
         JsonNode jsonNode = rootNode.at(path);
         return !jsonNode.isMissingNode();
-        //return jsonNode.isNull();
-        //return jsonNode != null;
+
     }
 }

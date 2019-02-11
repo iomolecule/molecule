@@ -52,6 +52,20 @@ import java.util.function.Function;
 
 import static com.github.bogieclj.molecule.util.JSONUtils.OBJECT_MAPPER;
 
+/**
+ * The base guice Module for all molecule modules.
+ * The Molecule Module provides the below capabilities to its users.
+ *
+ * <ol>
+ *    <li> Supports specifying Module Info as .json files under /info/ classpath</li>
+ *    <li> Supports specifying Domain information as .json files under /domains/ classpath </li>
+ *    <li> Supports specifying Message config as .json files under /msg-config/ classpath</li>
+ *    <li> Supports specifying Config as .json files under /config/ classpath</li>
+ * </ol>
+ *
+ * The Module looks for these above specified resources under
+ * the mentioned paths as well as uses the fully qualified name of the Module class to load the specified .json files.
+ */
 @Slf4j
 public abstract class MoleculeModule extends AbstractModule{
 

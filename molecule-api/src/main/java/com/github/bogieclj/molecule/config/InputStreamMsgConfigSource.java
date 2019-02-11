@@ -20,6 +20,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
 
+/**
+ * A simple InputStream based MsgConfigSource Implementation.
+ * This implementation allows multiple input streams to be composed as a singe message configuration source instance.
+ *
+ * The current implementation only supports 'JSON' streams.
+ * Internally the input streams are loaded as JSON nodes and they are logically merged in to a singe JSON node tree.
+ * The order of merge is as per the order of the input streams.
+ */
 @Slf4j
 public class InputStreamMsgConfigSource extends InputStreamConfigurationSource implements MsgConfigSource{
 
