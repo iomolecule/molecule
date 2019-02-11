@@ -257,6 +257,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.0.1</version>
                 <configuration>
+
                     <overview>${basedir}/molecule-impl/src/main/javadoc/overview.html</overview>
                     <!-- Specific configuration for the aggregate report -->
                     <excludePackageNames>com.github.bogieclj.molecule.mod.test1.*:com.github.bogieclj.molecule.mod.test2.*:com.github.bogieclj.molecule.playground.*</excludePackageNames>
@@ -275,6 +276,7 @@
                         <configuration>
                         </configuration>
                         <reports>
+                            <report>index</report>
                             <report>aggregate</report>
                         </reports>
                     </reportSet>

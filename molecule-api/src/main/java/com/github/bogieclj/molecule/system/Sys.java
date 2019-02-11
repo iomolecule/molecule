@@ -24,6 +24,10 @@ public interface Sys {
 
     /**
      * Method invoked by  the caller to start the 'system'
+     * Note that the start method could be synchronous (wait for the system and all services to be started before returning) or
+     * could be asynchronous (initiate the start and return immediately). This behaviour entirely depends on the {@link com.github.bogieclj.molecule.system.LifecycleManager} implementation
+     * configured in the system when the system is being composed using the @see com.github.bogieclj.molecule.mods.main.SysBuilder
+     *
      * @throws LifecycleException Exception thrown when errors occur during system startup
      */
     void start() throws LifecycleException;
@@ -36,6 +40,8 @@ public interface Sys {
 
     /**
      * Issues a stop signal when the Sys needs to be stopped
+     * Note that similar to the start() method, the behaviour (synchronous or asynchronous) depends on the
+     * {@link com.github.bogieclj.molecule.system.LifecycleManager} instance being used when building the system.
      */
     void stop();
 }

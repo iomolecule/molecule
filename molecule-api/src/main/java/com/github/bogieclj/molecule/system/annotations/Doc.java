@@ -21,10 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation is used to provide Documentation information about any Class it is attached to.
+ * This annotation is used by the Molecule system to retrieve documentation about Fn instances
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Doc {
 
+    /**
+     * The Documentation of the element being annotated with this annotation
+     * @return The Documentation of the element in question
+     */
     String value();
     
 }

@@ -17,6 +17,6 @@
 /**
  * The molecule services package holds all the key interfaces of the Services in the Molecule Framework.
  *
- * @author vijayakumarmohan
+ * @author vijayakumar mohan
  */
 package com.github.bogieclj.molecule.system.services;

@@ -16,17 +16,39 @@
 
 package com.github.bogieclj.molecule.system.services;
 
+/**
+ * The EventsService takes care of registering and un-registering EventSinks at the startup and shutdown of the molecule system
+ * Note: Like all Molecule Services the EventsService's lifecycle is also managed by the respective LifecycleManager
+ */
 public interface EventsService {
 
 
+    /**
+     * Registers the event sinks in the system to the Async and SyncEventBus
+     */
     public void registerEventSinks();
 
+    /**
+     * UnRegisters the event sinks in the system from the Async and SyncEventBus instances
+     */
     public void unRegisterEventSinks();
 
+    /**
+     * Checks if there are any valid event sinks registered in the system
+     * @return The availability of subscribers of events
+     */
     public boolean hasAnyEventSinks();
 
+    /**
+     * Retrieve the cound of subscribers of events
+     * @return Count of event subscribers in the system
+     */
     public int getCountOfEventSinks();
 
+    /**
+     * Retrieve all the subscribers registered in the system
+     * @return The array of subscribers
+     */
     public Object[] getAllEventSinks();
 
 }

@@ -16,10 +16,20 @@
 
 package com.github.bogieclj.molecule.system.services;
 
+/**
+ * The SysLifecyleCallbackService interface is used in the Molecule Framework internally to
+ * invoke all startup call backs.
+ */
 public interface SysLifecycleCallbackService {
 
+    /**
+     * Iterates and invokes all the Startup callbacks
+     */
     public void invokeAllStartupCallbacks();
 
+    /**
+     * Iterates and invokes all the Exit callbacks
+     */
     public void invokeAllExitCallbacks();
 
 

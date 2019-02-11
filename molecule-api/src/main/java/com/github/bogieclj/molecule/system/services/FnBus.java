@@ -23,14 +23,34 @@ import com.github.bogieclj.molecule.system.LifecycleException;
 import java.net.URI;
 import java.util.function.Consumer;
 
+/**
+ * The FnBus is the Function Bus in the system.
+ * It maintains the list of all Fn instances registered in the system and allows them to be executed.
+ */
 public interface FnBus extends Fn {
 
+    /**
+     * For each Fn in the bus, the consumer is invoked
+     * @param fnConsumer The Consumer Function which should be invoked for each Fn instance in the system
+     */
     public void forEach(Consumer<Fn> fnConsumer);
 
+    /**
+     * Checks for the presence of an Fn instance for the given URI
+     * @param uri The URI of the Fn to look for
+     * @return 'True' is present. 'False' if absent
+     */
     public boolean hasFnForURI(URI uri);
 
+    /**
+     * Starts the FnBus. Calling this method before all the methods in FnBus is necessary to successfully use FnBus
+     * @throws LifecycleException The exception when the Lifecycle Event happens
+     */
     public void start() throws LifecycleException;
 
+    /**
+     * Stops the FnBus and releases resources used if any.
+     */
     public void stop();
 
 }
