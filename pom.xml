@@ -25,6 +25,8 @@
     <modules>
         <module>molecule-api</module>
         <module>molecule-impl</module>
+        <module>molecule-sqlbase-api</module>
+        <module>molecule-sqlbase-impl</module>
         <!--module>playground</module-->
     </modules>
 

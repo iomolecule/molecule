@@ -1,0 +1,22 @@
+{
+  "sql" : {
+    "datasources" : {
+      "test-1" : {
+        "url" : "someurl-1",
+        "userId" : "test",
+        "password" : "password",
+        "attributes" : {
+          "key" : "value"
+        }
+      },
+      "test-2" : {
+        "url" : "someurl-2",
+        "userId" : "test",
+        "password" : "password",
+        "attributes" : {
+          "key" : "value"
+        }
+      }
+    }
+  }
+}

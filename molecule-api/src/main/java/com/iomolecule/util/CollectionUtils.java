@@ -20,6 +20,10 @@ import java.util.*;
 
 public class CollectionUtils {
 
+    public static <T> AbstractMap.SimpleEntry<String,Class<? extends T>> tuple(String k, Class<? extends T> type){
+        return new AbstractMap.SimpleEntry<>(k,type);
+    }
+
     public static AbstractMap.SimpleEntry<String,Object> KV(String k,Object v){
         return new AbstractMap.SimpleEntry<>(k,v);
     }

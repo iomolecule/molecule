@@ -24,6 +24,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
+import com.google.inject.name.Names;
 import com.iomolecule.system.*;
 import com.iomolecule.system.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ import com.iomolecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,6 +53,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.iomolecule.util.CollectionUtils.tuple;
 
 /**
  * The Main Module implementation in the Molecule Framework.
@@ -90,8 +93,11 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Override
     protected void configure() {
+        super.configure();
 
         bindMainArgs();
+
+        bindMainLifecycleManager();
 
         bindLifecycleManager();
 
@@ -109,21 +115,27 @@ public class DefaultMainModule extends MoleculeModule{
 
         bindFunc();
 
-        bindLifecycleManagers();
+        //bindLifecycleManagers();
 
         initModule();
 
         registerFuncs(ListAllFnsFunction.class);
     }
 
-    private void bindLifecycleManagers() {
+    private void bindMainLifecycleManager() {
+        binder().bind(LifecycleManager.class).annotatedWith(Names.named("main")).to(MainLifecycleManager.class).in(Singleton.class);
+    }
+
+
+    /*private void bindLifecycleManagers() {
 
         MapBinder<String, LifecycleManager> lifecycleManagerMapBinder =
                 MapBinder.newMapBinder(binder(), String.class, LifecycleManager.class,LifecycleManagers.class);
 
-        lifecycleManagerMapBinder.addBinding("main").to(MainLifecycleManager.class).in(Singleton.class);
+        //lifecycleManagerMapBinder.addBinding("main").to(MainLifecycleManager.class).in(Singleton.class);
 
-    }
+
+    }*/
 
     private void bindMsgConfigsSources() {
         Multibinder<ConfigurationSource> msgConfigSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},

@@ -22,7 +22,8 @@ package com.iomolecule.system;
  * In Molecule the LifecycleManager's can be logically composed to form higher level lifecycle manager instances which
  * is used to build on top of existing lifecycle managers provided within Molecule
  */
-public interface LifecycleManager {
+public interface LifecycleManager extends Ordered{
+
 
     /**
      * Intiates the start event of the LifecycleManager
@@ -34,4 +35,5 @@ public interface LifecycleManager {
      * Initiates the stop event of the LifecycleManager
      */
     public void stop();
+
 }

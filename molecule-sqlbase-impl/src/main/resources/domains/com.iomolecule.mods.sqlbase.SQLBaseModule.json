@@ -1,0 +1,13 @@
+{
+  "system": {
+    "datasources" : {
+      "jdbc" : {
+        "ls-datasources": {
+          "uri": "function://system/sqlbase/listAllDatasourcesFunction",
+          "doc": "Lists all the JDBC Datasources registered in the system along with their attributes"
+        }
+      }
+    }
+  }
+}
+

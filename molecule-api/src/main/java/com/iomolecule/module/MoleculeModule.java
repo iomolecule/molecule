@@ -16,12 +16,15 @@
 
 package com.iomolecule.module;
 
+import com.google.inject.multibindings.MapBinder;
 import com.iomolecule.config.ConfigurationSource;
 import com.iomolecule.config.InputStreamConfigurationSource;
 import com.iomolecule.config.InputStreamMsgConfigSource;
 import com.iomolecule.module.annotations.ModulesInfo;
+import com.iomolecule.system.LifecycleManager;
 import com.iomolecule.system.Operation;
 import com.iomolecule.system.Param;
+import com.iomolecule.system.annotations.LifecycleManagers;
 import com.iomolecule.util.JSONUtils;
 import com.google.common.io.ByteStreams;
 import com.google.inject.AbstractModule;
@@ -39,6 +42,7 @@ import com.iomolecule.system.SimpleOperation;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +78,24 @@ public abstract class MoleculeModule extends AbstractModule{
         registerDomainOperationsFromDefaultPath();
         registerConfigSourcesFromDefaultPath();
         registerMsgConfigSourcesFromDefaultPath();
+        registerLifecycleManagers();
+    }
+
+    protected void registerLifecycleManagers() {
+
+        MapBinder<String, LifecycleManager> lifecycleManagerMapBinder =
+                MapBinder.newMapBinder(binder(), String.class, LifecycleManager.class,LifecycleManagers.class);
+
+        AbstractMap.SimpleEntry<String, Class<? extends LifecycleManager>> lifecycleManagerEntry = getLifecycleManager();
+
+        if(lifecycleManagerEntry != null && lifecycleManagerEntry.getValue() != null) {
+            lifecycleManagerMapBinder.addBinding(lifecycleManagerEntry.getKey()).to(lifecycleManagerEntry.getValue()).in(Singleton.class);
+        }
+
+    }
+
+    protected AbstractMap.SimpleEntry<String,Class<? extends LifecycleManager>> getLifecycleManager(){
+        return null;
     }
 
     protected void registerConfigSourcesFromDefaultPath() {

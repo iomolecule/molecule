@@ -31,6 +31,7 @@ public class CompositeConfigurationSource implements ConfigurationSource{
         Set<ConfigurationSource> mergedSources = new LinkedHashSet<>();
         mergedSources.addAll(defaultConfigurationSources);
         mergedSources.addAll(configurationSources);
+        this.configurationSources = mergedSources;
     }
 
     public CompositeConfigurationSource(Set<ConfigurationSource> configurationSources){
