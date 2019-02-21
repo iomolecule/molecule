@@ -17,12 +17,10 @@
 package com.iomolecule.mods.sqlbase;
 
 import com.google.inject.Provides;
-import com.google.inject.multibindings.ProvidesIntoSet;
 import com.iomolecule.config.ConfigurationException;
 import com.iomolecule.config.ConfigurationSource;
-import com.iomolecule.config.InputStreamConfigurationSource;
-import com.iomolecule.config.annotations.DefaultConfigsSource;
 import com.iomolecule.module.MoleculeModule;
+import com.iomolecule.sql.base.SQLBaseConfig;
 import com.iomolecule.sql.base.SQLDatasourceDefMap;
 import com.iomolecule.sql.base.services.SQLDatasourceManagerService;
 import com.iomolecule.system.LifecycleManager;
@@ -49,13 +47,18 @@ public class SQLBaseModule extends MoleculeModule {
         }else{
             datasourceDefMap = SQLDatasourceDefMap.createSQLDatasourceDefMap(new HashMap<>());
         }
-        return new SQLDatasourceManagerServiceImpl(datasourceDefMap);
+
+        SQLBaseConfig sqlBaseConfig = null;
+
+        if(configurationSource.isValid("/sql/config")){
+            sqlBaseConfig = configurationSource.get("/sql/config",SQLBaseConfig.class);
+        }else{
+            sqlBaseConfig = new SQLBaseConfig("on-demand");
+        }
+
+
+        return new SQLDatasourceManagerServiceImpl(datasourceDefMap,sqlBaseConfig);
     }
 
-    /*@ProvidesIntoSet
-    @DefaultConfigsSource
-    public ConfigurationSource provideSQLBaseConfigSource(){
-        return new InputStreamConfigurationSource(false,true,
-                getClass().getResourceAsStream(String.format("/config/%s.json",getClass().getName())));
-    }*/
+
 }

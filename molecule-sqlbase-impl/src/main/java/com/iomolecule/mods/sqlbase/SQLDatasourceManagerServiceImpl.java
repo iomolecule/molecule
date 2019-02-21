@@ -16,6 +16,7 @@
 
 package com.iomolecule.mods.sqlbase;
 
+import com.iomolecule.sql.base.SQLBaseConfig;
 import com.iomolecule.sql.base.SQLDatasourceDefMap;
 import com.iomolecule.sql.base.services.SQLDatasourceManagerService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,21 +26,38 @@ class SQLDatasourceManagerServiceImpl implements SQLDatasourceManagerService{
 
 
     private SQLDatasourceDefMap defMap;
+    private SQLBaseConfig sqlBaseConfig;
 
-    public SQLDatasourceManagerServiceImpl(SQLDatasourceDefMap datasourceDefMap) {
+    public SQLDatasourceManagerServiceImpl(SQLDatasourceDefMap datasourceDefMap, SQLBaseConfig config) {
         defMap = datasourceDefMap;
+        sqlBaseConfig = config;
+
     }
 
     @Override
     public void start() {
         log.debug("Starting...");
 
+        createDatasources();
+
         log.info("DatasourceDefMap {}",defMap);
     }
+
+    private void createDatasources() {
+
+        if(sqlBaseConfig.getDatasourceCreationStrategy().equalsIgnoreCase("on-startup")){
+
+            log.debug("SQL Datasources will be created on-startup...");
+        }else{
+            log.debug("SQL Datasources will be created on-demand...");
+        }
+    }
+
 
     @Override
     public void stop() {
         log.debug("Stopping...");
 
+        log.debug("Closing all datasources...");
     }
 }

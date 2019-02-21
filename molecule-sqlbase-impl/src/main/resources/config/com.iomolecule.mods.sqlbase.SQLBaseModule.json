@@ -1,2 +1,7 @@
 {
+  "sql" : {
+    "config" : {
+      "ds-creation-strategy" : "on-startup"
+    }
+  }
 }

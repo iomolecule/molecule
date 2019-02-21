@@ -21,10 +21,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+import com.iomolecule.aop.matchers.MethodNameMatcher;
 import com.iomolecule.system.*;
 import com.iomolecule.system.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -115,11 +117,23 @@ public class DefaultMainModule extends MoleculeModule{
 
         bindFunc();
 
-        //bindLifecycleManagers();
+        bindInterceptors();
 
         initModule();
 
         registerFuncs(ListAllFnsFunction.class);
+    }
+
+    private void bindInterceptors() {
+
+        if(hasToPrintStartupTime()){
+            bindInterceptor(Matchers.subclassesOf(LifecycleManager.class),new MethodNameMatcher("start"),
+                    new LifecycleMgrStartupTimeInterceptor());
+        }
+    }
+
+    private boolean hasToPrintStartupTime() {
+        return systemInfo.getAttributes().containsKey("sys.print-startup-time");
     }
 
     private void bindMainLifecycleManager() {
@@ -127,15 +141,6 @@ public class DefaultMainModule extends MoleculeModule{
     }
 
 
-    /*private void bindLifecycleManagers() {
-
-        MapBinder<String, LifecycleManager> lifecycleManagerMapBinder =
-                MapBinder.newMapBinder(binder(), String.class, LifecycleManager.class,LifecycleManagers.class);
-
-        //lifecycleManagerMapBinder.addBinding("main").to(MainLifecycleManager.class).in(Singleton.class);
-
-
-    }*/
 
     private void bindMsgConfigsSources() {
         Multibinder<ConfigurationSource> msgConfigSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
