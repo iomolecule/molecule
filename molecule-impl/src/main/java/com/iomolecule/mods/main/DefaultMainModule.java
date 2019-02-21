@@ -163,6 +163,15 @@ public class DefaultMainModule extends MoleculeModule{
         Multibinder<ConfigurationSource> defaultConfigsSources = Multibinder.newSetBinder(binder(),new TypeLiteral<ConfigurationSource>(){},
                 DefaultConfigsSource.class);
 
+        if(configSources != null && configSources.length > 0){
+            for (ConfigurationSource configSource : configSources) {
+                if(configSource != null) {
+                    configsSources.addBinding().toInstance(configSource);
+                }
+            }
+
+        }
+
     }
 
     private void bindDomainOperations() {

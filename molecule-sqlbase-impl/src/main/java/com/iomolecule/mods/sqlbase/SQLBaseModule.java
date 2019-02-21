@@ -52,10 +52,10 @@ public class SQLBaseModule extends MoleculeModule {
         return new SQLDatasourceManagerServiceImpl(datasourceDefMap);
     }
 
-    @ProvidesIntoSet
+    /*@ProvidesIntoSet
     @DefaultConfigsSource
     public ConfigurationSource provideSQLBaseConfigSource(){
         return new InputStreamConfigurationSource(false,true,
                 getClass().getResourceAsStream(String.format("/config/%s.json",getClass().getName())));
-    }
+    }*/
 }
