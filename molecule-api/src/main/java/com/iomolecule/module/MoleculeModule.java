@@ -81,6 +81,11 @@ public abstract class MoleculeModule extends AbstractModule{
         registerLifecycleManagers();
     }
 
+    protected void registerSingleton(Class interfaceType,Class implType){
+
+        binder().bind(interfaceType).to(implType).in(Singleton.class);
+    }
+
     protected void registerLifecycleManagers() {
 
         MapBinder<String, LifecycleManager> lifecycleManagerMapBinder =

@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.iomolecule.sql.base.services;
+package com.iomolecule.system.annotations;
 
-import javax.sql.DataSource;
-import java.util.function.BiConsumer;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface SQLDatasourceManagerService {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface NotifyOnExit {
 
-    public void start();
+    String value();
 
-    public void forEach(BiConsumer<String,DataSource> dataSourceBiConsumer);
-
-    public void stop();
+    
 }

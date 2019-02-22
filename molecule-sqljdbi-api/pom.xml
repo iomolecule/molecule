@@ -25,24 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>molecule-sqlbase-impl</artifactId>
+    <artifactId>molecule-sqljdbi-api</artifactId>
 
 
-<dependencies>
-    <dependency>
-        <groupId>com.iomolecule</groupId>
-        <artifactId>molecule-sqlbase-api</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.iomolecule</groupId>
-        <artifactId>molecule-api</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-    <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-    </dependency>
-</dependencies>
 </project>

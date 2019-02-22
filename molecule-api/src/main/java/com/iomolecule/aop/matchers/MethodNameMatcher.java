@@ -19,22 +19,26 @@ package com.iomolecule.aop.matchers;
 import com.google.inject.matcher.AbstractMatcher;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class MethodNameMatcher extends AbstractMatcher<Method>{
 
-    private String methodName;
+    private List<String> methodNames;
 
-    public MethodNameMatcher(String name){
-        Objects.requireNonNull(name,"method name");
-        this.methodName = name;
+    public MethodNameMatcher(String... name){
+        Objects.requireNonNull(name,"method names");
+        this.methodNames = Arrays.asList(name);
     }
 
     @Override
     public boolean matches(Method method) {
         boolean retVal = false;
-        if(method.getName().equals(methodName)){
-            retVal = true;
+        if(methodNames != null && !methodNames.isEmpty()){
+            if(methodNames.contains(method.getName())){
+                retVal = true;
+            }
         }
         return retVal;
     }

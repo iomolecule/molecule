@@ -60,15 +60,20 @@ class JLineInteractiveShell implements Shell {
     //private Pattern pattern = Pattern.compile(" ");
     private Splitter splitter = Splitter.on(pattern).trimResults().omitEmptyStrings();
     private FnBus fnBus;
+    private LifecycleManager rootLifecycleManager;
 
     @Inject
-    JLineInteractiveShell(DomainService domainService, FnBus fnBus,@DomainStack Stack<String> domainStack){
+    JLineInteractiveShell(DomainService domainService,
+                          FnBus fnBus,
+                          @DomainStack Stack<String> domainStack,
+                          LifecycleManager rootLifecycleManager){
         commandsList = new String[]{"help","domains","ops","cd","pwd","exec","exit"};
         this.domainService = domainService;
         this.fnBus = fnBus;
         this.domainStack = domainStack;
         this.domainStack.push(ROOT_DOMAIN);
         this.domainOpCompleter = new DomainOperationsCompleter(domainService,domainStack);
+        this.rootLifecycleManager = rootLifecycleManager;
     }
 
     @Override
@@ -214,7 +219,8 @@ class JLineInteractiveShell implements Shell {
     @Override
     public void stop() {
         AnsiConsole.systemUninstall();
-
+        //System.exit(0);
+        //rootLifecycleManager.stop();
     }
     private String getPrompt_working(Stack<String> domainStack, String currentDomain,String postFix) {
         StringBuffer pathPrompt = new StringBuffer();

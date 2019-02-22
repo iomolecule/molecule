@@ -27,7 +27,8 @@
         <module>molecule-impl</module>
         <module>molecule-sqlbase-api</module>
         <module>molecule-sqlbase-impl</module>
-        <!--module>playground</module-->
+        <module>molecule-sqljdbi-api</module>
+        <module>molecule-sqljdbi-impl</module>
     </modules>
 
     <properties>
@@ -76,6 +77,15 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.jdbi</groupId>
+                <artifactId>jdbi3-bom</artifactId>
+                <type>pom</type>
+                <version>3.6.0</version>
+                <scope>import</scope>
+            </dependency>
+            
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -202,6 +212,12 @@
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
                 <version>4.6.32</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>3.3.1</version>
             </dependency>
 
         </dependencies>

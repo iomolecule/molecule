@@ -21,11 +21,15 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.iomolecule.ishell.annotations.DomainStack;
 import com.iomolecule.module.MoleculeModule;
+import com.iomolecule.system.LifecycleManager;
 import com.iomolecule.system.Shell;
 import com.iomolecule.system.annotations.Shells;
 
 import javax.inject.Singleton;
+import java.util.AbstractMap;
 import java.util.Stack;
+
+import static com.iomolecule.util.CollectionUtils.tuple;
 
 public class JLineInteractiveShellModule extends MoleculeModule{
 
@@ -60,4 +64,9 @@ public class JLineInteractiveShellModule extends MoleculeModule{
         return new Stack<String>();
     }
 
+
+    @Override
+    protected AbstractMap.SimpleEntry<String, Class<? extends LifecycleManager>> getLifecycleManager() {
+        return tuple("jline-interactive-shell",JLineShellLifecycleManager.class);
+    }
 }

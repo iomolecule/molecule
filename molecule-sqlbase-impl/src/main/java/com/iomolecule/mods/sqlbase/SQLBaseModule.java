@@ -16,6 +16,7 @@
 
 package com.iomolecule.mods.sqlbase;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Provides;
 import com.iomolecule.config.ConfigurationException;
 import com.iomolecule.config.ConfigurationSource;
@@ -24,6 +25,7 @@ import com.iomolecule.sql.base.SQLBaseConfig;
 import com.iomolecule.sql.base.SQLDatasourceDefMap;
 import com.iomolecule.sql.base.services.SQLDatasourceManagerService;
 import com.iomolecule.system.LifecycleManager;
+import com.iomolecule.system.annotations.AsyncEventBus;
 
 import javax.inject.Singleton;
 import java.util.AbstractMap;
@@ -40,7 +42,7 @@ public class SQLBaseModule extends MoleculeModule {
 
     @Provides
     @Singleton
-    public SQLDatasourceManagerService provideSQLDatasourceManagerService(ConfigurationSource configurationSource) throws ConfigurationException {
+    public SQLDatasourceManagerService provideSQLDatasourceManagerService(ConfigurationSource configurationSource, @AsyncEventBus EventBus eventBus) throws ConfigurationException {
         SQLDatasourceDefMap datasourceDefMap = null;
         if(configurationSource.isValid("/sql")){
             datasourceDefMap = configurationSource.get("/sql",SQLDatasourceDefMap.class);
@@ -57,7 +59,7 @@ public class SQLBaseModule extends MoleculeModule {
         }
 
 
-        return new SQLDatasourceManagerServiceImpl(datasourceDefMap,sqlBaseConfig);
+        return new SQLDatasourceManagerServiceImpl(datasourceDefMap,sqlBaseConfig,eventBus);
     }
 
 

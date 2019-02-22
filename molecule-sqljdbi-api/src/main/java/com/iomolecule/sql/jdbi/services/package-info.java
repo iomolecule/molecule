@@ -14,16 +14,4 @@
  * limitations under the License.
  */
 
-package com.iomolecule.sql.base.services;
-
-import javax.sql.DataSource;
-import java.util.function.BiConsumer;
-
-public interface SQLDatasourceManagerService {
-
-    public void start();
-
-    public void forEach(BiConsumer<String,DataSource> dataSourceBiConsumer);
-
-    public void stop();
-}
+package com.iomolecule.sql.jdbi.services;

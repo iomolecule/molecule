@@ -126,14 +126,28 @@ public class DefaultMainModule extends MoleculeModule{
 
     private void bindInterceptors() {
 
-        if(hasToPrintStartupTime()){
-            bindInterceptor(Matchers.subclassesOf(LifecycleManager.class),new MethodNameMatcher("start"),
+        if(hasToPrintLifecycleTime()){
+            bindInterceptor(Matchers.subclassesOf(LifecycleManager.class),new MethodNameMatcher("start","stop"),
                     new LifecycleMgrStartupTimeInterceptor());
+        }
+
+        if(!isNotificationDisabled()){
+            NotificationInterceptor onEntryInterceptor = new NotificationInterceptor(NotifyOnEntry.class);
+            NotificationInterceptor onExitInterceptor = new NotificationInterceptor(NotifyOnExit.class);
+            binder().requestInjection(onEntryInterceptor);
+            binder().requestInjection(onExitInterceptor);
+
+            bindInterceptor(Matchers.any(),Matchers.annotatedWith(NotifyOnEntry.class),onEntryInterceptor);
+            bindInterceptor(Matchers.any(),Matchers.annotatedWith(NotifyOnExit.class),onExitInterceptor);
         }
     }
 
-    private boolean hasToPrintStartupTime() {
-        return systemInfo.getAttributes().containsKey("sys.print-startup-time");
+    private boolean isNotificationDisabled() {
+        return systemInfo.getAttributes().containsKey("sys.ignore-notification-annotation");
+    }
+
+    private boolean hasToPrintLifecycleTime() {
+        return systemInfo.getAttributes().containsKey("sys.print-lifecycle-time");
     }
 
     private void bindMainLifecycleManager() {

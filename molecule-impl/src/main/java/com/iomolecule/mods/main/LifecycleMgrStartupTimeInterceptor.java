@@ -32,7 +32,8 @@ class LifecycleMgrStartupTimeInterceptor implements MethodInterceptor {
         watch.start();
         Object response = methodInvocation.proceed();
         watch.stop();
-        log.info("{} - Started in {} ms...",methodInvocation.getMethod().getDeclaringClass().getName(),watch.getTime(TimeUnit.MILLISECONDS));
+        log.info("{}-{} - completed in {} ms...",methodInvocation.getMethod().getDeclaringClass().getName(),
+                methodInvocation.getMethod().getName(),watch.getTime(TimeUnit.MILLISECONDS));
         return response;
     }
 }

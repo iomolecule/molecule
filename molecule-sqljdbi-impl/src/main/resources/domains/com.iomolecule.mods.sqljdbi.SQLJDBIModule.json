@@ -1,0 +1,13 @@
+{
+  "system": {
+    "sql" : {
+      "jdbi" : {
+        "ls-jdbi": {
+          "uri": "function://system/sqljdbi/listAllJDBIsFunction",
+          "doc": "Lists all the JDBI instances registered in the system along with their attributes"
+        }
+      }
+    }
+  }
+}
+
