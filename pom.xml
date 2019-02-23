@@ -29,6 +29,8 @@
         <module>molecule-sqlbase-impl</module>
         <module>molecule-sqljdbi-api</module>
         <module>molecule-sqljdbi-impl</module>
+        <module>molecule-httpshell-api</module>
+        <module>molecule-httpshell-impl</module>
     </modules>
 
     <properties>

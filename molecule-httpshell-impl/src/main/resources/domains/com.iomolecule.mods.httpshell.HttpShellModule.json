@@ -1,0 +1,24 @@
+{
+  "system" : {
+    "help" :{
+      "uri" : "function://system/httpshell/listHelpFun",
+      "doc" : "Show this help!"
+    },
+    "domains" : {
+      "uri" : "function://system/httpshell/listDomainsFun",
+      "doc" : "List all valid accessible domains within the current active domain"
+    },
+    "ops" : {
+      "uri" : "function://system/httpshell/listOperationsFun",
+      "doc" : "List all valid accessible operations within the current active domain"
+    },
+    "modules" : {
+      "uri" : "function://system/httpshell/listModulesFun",
+      "doc" : "Lists installed modules within the system"
+    },
+    "about" : {
+      "uri" : "function://system/httpshell/aboutModuleFun",
+      "doc" : "Provides details about a specified module given its name"
+    }
+  }
+}

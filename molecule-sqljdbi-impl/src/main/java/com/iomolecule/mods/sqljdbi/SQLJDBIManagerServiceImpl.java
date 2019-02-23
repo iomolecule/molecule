@@ -16,7 +16,6 @@
 
 package com.iomolecule.mods.sqljdbi;
 
-import com.google.common.eventbus.EventBus;
 import com.iomolecule.sql.base.services.SQLDatasourceManagerService;
 import com.iomolecule.sql.jdbi.services.SQLJDBIManagerService;
 import com.iomolecule.system.annotations.NotifyOnEntry;
