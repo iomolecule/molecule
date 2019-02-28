@@ -18,12 +18,17 @@ package com.iomolecule.mods.ishell;
 
 import com.iomolecule.system.Param;
 import com.iomolecule.system.annotations.Id;
+import com.iomolecule.system.annotations.Out;
+import com.iomolecule.system.annotations.ParamDecl;
 
 import java.util.function.Function;
 
 import static com.iomolecule.mods.ishell.IShellConstants.EXIT_SYSTEM;
 
 @Id("function://system/ishell/jline/exitSystemFun")
+@Out(
+        params = @ParamDecl(key = EXIT_SYSTEM,type = Boolean.class, mandatory = true)
+)
 class ExitSystemFunction implements Function<Param,Param> {
 
 

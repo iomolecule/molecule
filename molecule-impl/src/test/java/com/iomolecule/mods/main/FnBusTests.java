@@ -19,17 +19,16 @@ package com.iomolecule.mods.main;
 import com.google.common.eventbus.EventBus;
 import com.iomolecule.config.InputStreamMsgConfigSource;
 import com.iomolecule.config.MsgConfigSource;
+import com.iomolecule.system.*;
+import com.iomolecule.system.services.FnInterceptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import com.iomolecule.commons.Constants;
-import com.iomolecule.system.Fn;
-import com.iomolecule.system.InOutParam;
-import com.iomolecule.system.LifecycleException;
-import com.iomolecule.system.Param;
 import com.iomolecule.system.services.FnBus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.iomolecule.util.CollectionUtils.SET;
@@ -39,7 +38,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusSimple() throws LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -56,7 +55,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusSimple2() throws URISyntaxException, LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -74,7 +73,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusInvalidFn() throws URISyntaxException, LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -92,7 +91,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusExceptionFn()throws URISyntaxException, LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -110,7 +109,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusExceptionWithMessageFn()throws URISyntaxException, LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -128,7 +127,7 @@ public class FnBusTests {
 
     @Test
     public void testFnBusAddFn()throws URISyntaxException, LifecycleException {
-        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider());
+        FnBus fnBus = new DefaultFnBus(getFns(),getEventBus(),getMessageConfigProvider(),getFnInterceptionService());
 
         fnBus.start();
 
@@ -158,6 +157,26 @@ public class FnBusTests {
     private MsgConfigSource getMessageConfigProvider(){
         return new InputStreamMsgConfigSource(false,false,
                 getClass().getResourceAsStream("/test/fn-bus-test.json"));
+    }
+
+    private FnInterceptionService getFnInterceptionService(){
+        return new FnInterceptionServiceImpl(getFnInterceptors());
+    }
+
+    private Set<FnInterceptor> getFnInterceptors() {
+        Set<FnInterceptor> fnInterceptors = new HashSet<>();
+        fnInterceptors.add(new FnInterceptor() {
+            @Override
+            public Param before(Fn fn, Param input) {
+                return input;
+            }
+
+            @Override
+            public Param after(Fn fn, Param output) {
+                return output;
+            }
+        });
+        return fnInterceptors;
     }
 }
 

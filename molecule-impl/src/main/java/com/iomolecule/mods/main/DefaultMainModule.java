@@ -25,10 +25,13 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
+import com.google.inject.multibindings.ProvidesIntoSet;
 import com.google.inject.name.Names;
 import com.iomolecule.aop.matchers.MethodNameMatcher;
 import com.iomolecule.system.*;
+import com.iomolecule.system.Param;
 import com.iomolecule.system.annotations.*;
+import com.iomolecule.system.services.*;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.config.CompositeConfigurationSource;
 import com.iomolecule.config.CompositeMsgConfigSource;
@@ -39,10 +42,6 @@ import com.iomolecule.config.annotations.DefaultConfigsSource;
 import com.iomolecule.config.annotations.MsgConfigsSource;
 import com.iomolecule.module.ModuleInfo;
 import com.iomolecule.module.MoleculeModule;
-import com.iomolecule.system.services.DomainService;
-import com.iomolecule.system.services.EventsService;
-import com.iomolecule.system.services.FnBus;
-import com.iomolecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -136,10 +135,13 @@ public class DefaultMainModule extends MoleculeModule{
             NotificationInterceptor onExitInterceptor = new NotificationInterceptor(NotifyOnExit.class);
             binder().requestInjection(onEntryInterceptor);
             binder().requestInjection(onExitInterceptor);
-
             bindInterceptor(Matchers.any(),Matchers.annotatedWith(NotifyOnEntry.class),onEntryInterceptor);
             bindInterceptor(Matchers.any(),Matchers.annotatedWith(NotifyOnExit.class),onExitInterceptor);
         }
+
+        binder().bind(FnInterceptionService.class).to(FnInterceptionServiceImpl.class).in(Singleton.class);
+
+
     }
 
     private boolean isNotificationDisabled() {
@@ -322,13 +324,22 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Provides
     @Singleton
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,@Func Set<Function<Param,Param>> functions, @AsyncEventBus EventBus eventBus,
+    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,
+                                     @Func Set<Function<Param,Param>> functions,
+                                     @AsyncEventBus EventBus eventBus,
+                                     FnInterceptionService fnInterceptionService,
                                      MsgConfigSource msgConfigSource){
 
-        return new DefaultFnBus(fns,fnsList,functions,eventBus,msgConfigSource);
+        return new DefaultFnBus(fns,fnsList,functions,eventBus,msgConfigSource,fnInterceptionService);
     }
 
 
+    @ProvidesIntoSet
+    @FnInterceptors
+    @Singleton
+    public FnInterceptor provideInOutInterceptor(){
+        return new FnInOutInterceptor();
+    }
 
 
 }
