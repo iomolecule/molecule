@@ -17,14 +17,14 @@
 package com.iomolecule.module;
 
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import com.iomolecule.config.ConfigurationSource;
 import com.iomolecule.config.InputStreamConfigurationSource;
 import com.iomolecule.config.InputStreamMsgConfigSource;
 import com.iomolecule.module.annotations.ModulesInfo;
-import com.iomolecule.system.LifecycleManager;
-import com.iomolecule.system.Operation;
-import com.iomolecule.system.Param;
+import com.iomolecule.system.*;
 import com.iomolecule.system.annotations.LifecycleManagers;
+import com.iomolecule.system.annotations.Shells;
 import com.iomolecule.util.JSONUtils;
 import com.google.common.io.ByteStreams;
 import com.google.inject.AbstractModule;
@@ -37,7 +37,6 @@ import com.iomolecule.system.annotations.Func;
 import io.datatree.Tree;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.config.MsgConfigSource;
-import com.iomolecule.system.SimpleOperation;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -79,6 +78,13 @@ public abstract class MoleculeModule extends AbstractModule{
         registerConfigSourcesFromDefaultPath();
         registerMsgConfigSourcesFromDefaultPath();
         registerLifecycleManagers();
+    }
+
+    protected void registerShell(String name, Class<? extends Shell> shellImpl){
+        bind(shellImpl).in(Singleton.class);
+        bind(Shell.class).annotatedWith(Names.named(name)).to(shellImpl);
+        MapBinder<String, Shell> shellMapBinder = MapBinder.newMapBinder(binder(), String.class, Shell.class, Shells.class);
+        shellMapBinder.addBinding(name).to(shellImpl);
     }
 
     protected void registerSingleton(Class interfaceType,Class implType){

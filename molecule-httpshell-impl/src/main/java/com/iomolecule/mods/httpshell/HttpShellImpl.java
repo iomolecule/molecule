@@ -16,45 +16,43 @@
 
 package com.iomolecule.mods.httpshell;
 
-import com.iomolecule.system.LifecycleException;
-import com.iomolecule.system.LifecycleManager;
+import com.iomolecule.shell.http.HttpShellConfig;
 import com.iomolecule.system.Shell;
-import com.iomolecule.system.annotations.MainArgs;
+import io.undertow.Undertow;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Objects;
 
 @Slf4j
-class HttpShellLifecycleManager implements LifecycleManager{
+class HttpShellImpl implements Shell{
 
-    private Shell httpShell;
-    private String[] mainArgs;
+    private HttpShellConfig httpShellConfig;
+    private Undertow undertow;
 
     @Inject
-    HttpShellLifecycleManager(@MainArgs String[] mainArgs, @Named("shell://http/default") Shell httpShell){
-        Objects.requireNonNull(httpShell,"http shell");
-        this.httpShell = httpShell;
-        this.mainArgs = mainArgs;
-
+    HttpShellImpl(HttpShellConfig httpShellConfig){
+        Objects.requireNonNull(httpShellConfig,"http shell config");
+        this.httpShellConfig = httpShellConfig;
     }
-    @Override
-    public void start() throws LifecycleException {
-        log.debug("Starting...");
 
-        httpShell.start(mainArgs);
+    @Override
+    public void start(String[] args) {
+        log.debug("Starting....");
+
+        Undertow.Builder httpShellBuilder = Undertow.builder().addHttpListener(httpShellConfig.getPort(), httpShellConfig.getBindAddress());
+        httpShellBuilder.setHandler(new HttpHandler());
+        undertow = httpShellBuilder.build();
+
+        undertow.start();
     }
 
     @Override
     public void stop() {
         log.debug("Stopping...");
-        httpShell.stop();
-        httpShell = null;
-    }
 
-    @Override
-    public int getOrder() {
-        return Integer.MAX_VALUE - 100;
+        if(undertow != null){
+            undertow.stop();
+        }
     }
 }

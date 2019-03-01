@@ -1,0 +1,6 @@
+{
+  "http-shell-config" : {
+    "port" : 9000,
+    "bind-address" : "localhost"
+  }
+}

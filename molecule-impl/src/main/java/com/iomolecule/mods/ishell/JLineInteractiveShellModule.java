@@ -37,10 +37,11 @@ public class JLineInteractiveShellModule extends MoleculeModule{
     @Override
     protected void configure() {
         initModule();
-        bind(JLineInteractiveShell.class).in(Singleton.class);
+        /*bind(JLineInteractiveShell.class).in(Singleton.class);
         bind(Shell.class).annotatedWith(Names.named("shell://interactive/jline")).to(JLineInteractiveShell.class);
         MapBinder<String, Shell> shellMapBinder = MapBinder.newMapBinder(binder(), String.class, Shell.class, Shells.class);
-        shellMapBinder.addBinding("shell://interactive/jline").to(JLineInteractiveShell.class);
+        shellMapBinder.addBinding("shell://interactive/jline").to(JLineInteractiveShell.class);*/
+        registerShell("shell://interactive/jline",JLineInteractiveShell.class);
         registerFuncs();
     }
 
