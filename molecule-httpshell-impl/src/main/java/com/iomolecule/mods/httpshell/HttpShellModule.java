@@ -17,15 +17,20 @@
 package com.iomolecule.mods.httpshell;
 
 import com.google.inject.Provides;
+import com.google.inject.multibindings.ProvidesIntoSet;
+import com.google.inject.name.Names;
 import com.iomolecule.config.ConfigurationException;
 import com.iomolecule.config.ConfigurationSource;
 import com.iomolecule.module.MoleculeModule;
 import com.iomolecule.shell.http.HttpShellConfig;
+import com.iomolecule.shell.http.MediaType;
+import com.iomolecule.shell.http.annotations.SupportedMediaTypes;
 import com.iomolecule.system.LifecycleManager;
 
 import javax.inject.Singleton;
 import java.util.AbstractMap;
 
+import static com.iomolecule.util.CollectionUtils.LIST;
 import static com.iomolecule.util.CollectionUtils.tuple;
 
 public class HttpShellModule extends MoleculeModule {
@@ -39,6 +44,10 @@ public class HttpShellModule extends MoleculeModule {
     protected void configure() {
         super.configure();
         registerShell("shell://http/default",HttpShellImpl.class);
+
+        binder().bind(io.undertow.server.HttpHandler.class)
+                .annotatedWith(Names.named("main-http-shell-handler"))
+                .to(HttpHandler.class).in(Singleton.class);
     }
 
     @Provides
@@ -60,5 +69,12 @@ public class HttpShellModule extends MoleculeModule {
 
     }
 
+
+    @ProvidesIntoSet
+    @SupportedMediaTypes
+    @Singleton
+    public String provideSupportedMediaTypeJson(){
+        return MediaType.APPLICATION_JSON;
+    }
 
 }

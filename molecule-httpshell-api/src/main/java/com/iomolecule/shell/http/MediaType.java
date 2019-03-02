@@ -16,25 +16,11 @@
 
 package com.iomolecule.shell.http;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+public final class MediaType {
 
-import java.util.List;
+    public static final String APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_XML = "application/xml";
+    public static final String TEXT_PLAIN = "text/plain";
 
-@Value
-public class HttpShellConfig {
-
-    private Integer port;
-
-    private String bindAddress;
-
-
-
-    @JsonCreator
-    public static HttpShellConfig createHttpShellConfig(@JsonProperty("port") Integer port,
-                                                        @JsonProperty("bind-address") String bindAddress){
-        return new HttpShellConfig(port,bindAddress);
-    }
-
+    public static final String ACCEPT_ALL = "*/*";
 }

@@ -120,7 +120,11 @@ public class DefaultMainModule extends MoleculeModule{
 
         initModule();
 
-        registerFuncs(ListAllFnsFunction.class);
+        registerFuncs(ListAllFnsFunction.class,
+                ListSystemPropertiesFunction.class,
+                ListAllDomainsFunction.class,
+                ListAllModulesFunction.class);
+
     }
 
     private void bindInterceptors() {

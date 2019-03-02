@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package com.iomolecule.shell.http;
+package com.iomolecule.shell.http.annotations;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-
-@Value
-public class HttpShellConfig {
-
-    private Integer port;
-
-    private String bindAddress;
-
-
-
-    @JsonCreator
-    public static HttpShellConfig createHttpShellConfig(@JsonProperty("port") Integer port,
-                                                        @JsonProperty("bind-address") String bindAddress){
-        return new HttpShellConfig(port,bindAddress);
-    }
-
+/**
+ * The Injection annotation used to look up Asynchronous Event Bus from the Molecule System.
+ */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+public @interface SupportedMediaTypes {
 }

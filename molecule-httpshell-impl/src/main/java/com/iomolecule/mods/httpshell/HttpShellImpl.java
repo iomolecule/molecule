@@ -19,9 +19,12 @@ package com.iomolecule.mods.httpshell;
 import com.iomolecule.shell.http.HttpShellConfig;
 import com.iomolecule.system.Shell;
 import io.undertow.Undertow;
+import io.undertow.server.handlers.BlockingHandler;
+import io.undertow.server.HttpHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Objects;
 
 @Slf4j
@@ -29,11 +32,14 @@ class HttpShellImpl implements Shell{
 
     private HttpShellConfig httpShellConfig;
     private Undertow undertow;
+    private HttpHandler mainHandler;
 
     @Inject
-    HttpShellImpl(HttpShellConfig httpShellConfig){
+    HttpShellImpl(HttpShellConfig httpShellConfig,@Named("main-http-shell-handler") HttpHandler mainHandler){
         Objects.requireNonNull(httpShellConfig,"http shell config");
+        Objects.requireNonNull(mainHandler,"main http handler");
         this.httpShellConfig = httpShellConfig;
+        this.mainHandler = mainHandler;
     }
 
     @Override
@@ -41,7 +47,7 @@ class HttpShellImpl implements Shell{
         log.debug("Starting....");
 
         Undertow.Builder httpShellBuilder = Undertow.builder().addHttpListener(httpShellConfig.getPort(), httpShellConfig.getBindAddress());
-        httpShellBuilder.setHandler(new HttpHandler());
+        httpShellBuilder.setHandler(new BlockingHandler(mainHandler));
         undertow = httpShellBuilder.build();
 
         undertow.start();
@@ -50,6 +56,7 @@ class HttpShellImpl implements Shell{
     @Override
     public void stop() {
         log.debug("Stopping...");
+
 
         if(undertow != null){
             undertow.stop();

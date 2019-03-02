@@ -20,6 +20,7 @@ import com.iomolecule.system.Operation;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The DomainService provides information about valid 'Domains' and its related 'Operation' in the Molecule framework.
@@ -112,4 +113,11 @@ public interface DomainService {
      * @return 'True' if the domain is valid in the path, 'False' otherwise
      */
     public boolean isValidDomainAt(String path,String domain);
+
+
+    /**
+     * Retrieves all the domain information as a tree in a map data structure
+     * @return Map of domain tree
+     */
+    public Map getDomainTree();
 }

@@ -23,12 +23,11 @@ import com.iomolecule.system.SimpleOperation;
 import com.iomolecule.system.services.DomainService;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.iomolecule.util.CollectionUtils.KV;
+import static com.iomolecule.util.CollectionUtils.MAP;
 
 @Slf4j
 class DefaultDomainService implements DomainService {
@@ -161,12 +160,15 @@ class DefaultDomainService implements DomainService {
 
         List<Operation> operations = new ArrayList<>();
 
+
         domainTree.forEach(tree -> {
+
             Object opObj = tree.asObject();
             if(opObj instanceof Operation){
                 operations.add((Operation)opObj);
             }
         });
+
 
 
         return operations;
@@ -206,5 +208,27 @@ class DefaultDomainService implements DomainService {
     public boolean isValidDomainAt(String path, String domain) {
         List<String> domainNamesAt = getDomainNamesAt(path);
         return domainNamesAt.contains(domain);
+    }
+
+    @Override
+    public Map getDomainTree() {
+        return getTreeAsMap(domainTree);
+    }
+
+    private Map getTreeAsMap(Tree tree){
+
+        Map mapTree = new HashMap();
+
+        tree.forEach(childTree->{
+            Object obj = childTree.asObject();
+            if(obj instanceof Operation){
+                Operation op = (Operation)obj;
+                mapTree.put(op.getSimpleName(),MAP(KV("uri",op.getFunctionURI()),KV("doc",op.getDoc())));
+            }else{
+                mapTree.put(childTree.getName(),getTreeAsMap(childTree));
+            }
+        });
+
+        return mapTree;
     }
 }
