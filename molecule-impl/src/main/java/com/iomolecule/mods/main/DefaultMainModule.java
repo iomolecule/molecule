@@ -18,6 +18,7 @@ package com.iomolecule.mods.main;
 
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -28,11 +29,6 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import com.google.inject.name.Names;
 import com.iomolecule.aop.matchers.MethodNameMatcher;
-import com.iomolecule.system.*;
-import com.iomolecule.system.Param;
-import com.iomolecule.system.annotations.*;
-import com.iomolecule.system.services.*;
-import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.config.CompositeConfigurationSource;
 import com.iomolecule.config.CompositeMsgConfigSource;
 import com.iomolecule.config.ConfigurationSource;
@@ -42,11 +38,16 @@ import com.iomolecule.config.annotations.DefaultConfigsSource;
 import com.iomolecule.config.annotations.MsgConfigsSource;
 import com.iomolecule.module.ModuleInfo;
 import com.iomolecule.module.MoleculeModule;
+import com.iomolecule.system.*;
+import com.iomolecule.system.Param;
+import com.iomolecule.system.annotations.*;
+import com.iomolecule.system.services.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -54,7 +55,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.iomolecule.util.CollectionUtils.tuple;
 
 /**
  * The Main Module implementation in the Molecule Framework.
@@ -72,13 +72,18 @@ public class DefaultMainModule extends MoleculeModule{
     private String[] mainArgs;
     private OnStartup[] onStartupInstances;
     private OnExit[] onExitInstances;
+    private String[] domainDefinitionPaths;
+    private List<Class> fnProviderClasses;
+    private Map<Class,TypeConverter> typeConverterMap;
 
     public DefaultMainModule(ModuleInfo moduleInfo,
                              ConfigurationSource[] configurationSources,
                              Class<? extends LifecycleManager> lifecycleManagerClazz,
                              Object[] eventSinks, String[] mainArgs,
                              Class<? extends OnStartup>[] startupclzes,
-                             Class<? extends OnExit>[] onexitClzes,OnStartup[] onStartupInstances,OnExit[] onExitInstances) {
+                             Class<? extends OnExit>[] onexitClzes,OnStartup[] onStartupInstances,OnExit[] onExitInstances,
+                             String[] domainDefinitionPaths,List<Class> fnProviderClasses,
+                             Map<Class,TypeConverter> typeConverterMap) {
         checkArgument(moduleInfo != null,"ModuleInfo cannot be null or empty!");
         checkArgument(lifecycleManagerClazz != null, "Lifecycle Manager class cannot be null or empty!");
         this.systemInfo = moduleInfo;
@@ -90,6 +95,9 @@ public class DefaultMainModule extends MoleculeModule{
         this.exitClazzes = onexitClzes;
         this.onStartupInstances = onStartupInstances;
         this.onExitInstances = onExitInstances;
+        this.domainDefinitionPaths = domainDefinitionPaths;
+        this.fnProviderClasses = fnProviderClasses;
+        this.typeConverterMap = typeConverterMap;
     }
 
     @Override
@@ -116,7 +124,11 @@ public class DefaultMainModule extends MoleculeModule{
 
         bindFunc();
 
+        bindMethodFnProviders();
+
         bindInterceptors();
+
+        bindTypeConverters();
 
         initModule();
 
@@ -125,6 +137,40 @@ public class DefaultMainModule extends MoleculeModule{
                 ListAllDomainsFunction.class,
                 ListAllModulesFunction.class);
 
+        registerDomainOperationsForSystem();
+
+        registerFnProviders();
+    }
+
+    private void bindTypeConverters() {
+        MapBinder<Class,TypeConverter> typeConverterBinder = MapBinder.newMapBinder(binder(),Class.class,TypeConverter.class);
+
+        if(typeConverterMap != null && !typeConverterMap.isEmpty()){
+            typeConverterMap.forEach((clz,converter)->{
+                typeConverterBinder.addBinding(clz).toInstance(converter);
+            });
+        }
+    }
+
+    private void registerFnProviders() {
+
+        Multibinder<Object> fnProviders = Multibinder.newSetBinder(binder(),Object.class,FnProvider.class);
+
+        if(fnProviderClasses != null && !fnProviderClasses.isEmpty()){
+            for (Class fnProviderClass : fnProviderClasses) {
+                fnProviders.addBinding().to(fnProviderClass).in(Singleton.class);
+            }
+
+        }
+    }
+
+    private void registerDomainOperationsForSystem() {
+        if(domainDefinitionPaths != null && domainDefinitionPaths.length > 0){
+            for (String domainDefinitionPath : domainDefinitionPaths) {
+                registerDomainOperationsFromClasspath(domainDefinitionPath);
+            }
+
+        }
     }
 
     private void bindInterceptors() {
@@ -180,6 +226,10 @@ public class DefaultMainModule extends MoleculeModule{
         Multibinder<List<Fn>> funsList = Multibinder.newSetBinder(binder(),new TypeLiteral<List<Fn>>(){},
                 Funs.class);
 
+    }
+
+    private void bindMethodFnProviders(){
+        Multibinder<Object> methodFns = Multibinder.newSetBinder(binder(),Object.class,MethodFnProvider.class);
     }
 
     private void bindConfigsSources() {
@@ -260,6 +310,11 @@ public class DefaultMainModule extends MoleculeModule{
         bind(LifecycleManager.class).to(lifecycleManagerClass).in(Singleton.class);
     }
 
+    @Provides
+    @Singleton
+    public TypeConversionService provideTypeConversionService(Map<Class,TypeConverter> converterMap){
+        return new TypeConversionServiceImpl(converterMap);
+    }
 
     @Provides
     @SyncEventBus
@@ -328,22 +383,27 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Provides
     @Singleton
-    public FnBus provideDefaultFnBus(@Fun Set<Fn> fns,@Funs Set<List<Fn>> fnsList,
+    public FnBus provideDefaultFnBus(Injector injector, @Fun Set<Fn> fns, @Funs Set<List<Fn>> fnsList,
                                      @Func Set<Function<Param,Param>> functions,
                                      @AsyncEventBus EventBus eventBus,
+                                     @MethodFnProvider Set<Object> methodFnProviders,
+                                     @FnProvider Set<Object> fnProviderClasses,
                                      FnInterceptionService fnInterceptionService,
                                      MsgConfigSource msgConfigSource){
 
-        return new DefaultFnBus(fns,fnsList,functions,eventBus,msgConfigSource,fnInterceptionService);
+        return new DefaultFnBus(injector,fns,fnsList,functions,methodFnProviders,
+                fnProviderClasses,eventBus,msgConfigSource,fnInterceptionService);
     }
 
 
     @ProvidesIntoSet
     @FnInterceptors
     @Singleton
-    public FnInterceptor provideInOutInterceptor(){
-        return new FnInOutInterceptor();
+    public FnInterceptor provideInOutInterceptor(TypeConversionService typeConversionService){
+        return new FnInOutInterceptor(typeConversionService);
     }
+
+
 
 
 }

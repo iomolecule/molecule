@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system.annotations;
+package com.iomolecule.system;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface TypeConverter {
 
-/**
- * This annotation should be attached to all entities which need to be uniquely identified within the molecule system.
- * The Framework uses it to uniquely identify Function instances.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.METHOD})
-public @interface Id {
+    public Object convert(Object in);
 
-    String value();
-    
 }

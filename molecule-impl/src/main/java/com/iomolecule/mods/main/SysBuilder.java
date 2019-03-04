@@ -21,13 +21,11 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.iomolecule.config.ConfigurationSource;
 import com.iomolecule.module.ModuleInfo;
-import com.iomolecule.system.LifecycleManager;
-import com.iomolecule.system.OnExit;
-import com.iomolecule.system.OnStartup;
-import com.iomolecule.system.Sys;
+import com.iomolecule.system.*;
+import com.iomolecule.system.annotations.FnProvider;
+import com.iomolecule.util.ClasspathScanner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.iomolecule.util.CollectionUtils.MAP;
 import static com.google.common.base.Preconditions.checkArgument;
@@ -45,6 +43,9 @@ public class SysBuilder {
     private Class<? extends OnExit>[] onExitClasses;
     private OnStartup[] onStartupInstances;
     private OnExit[] onExitInstances;
+    private String[] domainDefinitionPaths;
+    private String[] classpathsToScanForFnProviders;
+    private Map<Class,TypeConverter> typeConverterMap;
 
     public SysBuilder(){
         this(null);
@@ -54,6 +55,23 @@ public class SysBuilder {
         this.args = args;
     }
 
+    public SysBuilder withConverterEntries(AbstractMap.SimpleEntry<Class,TypeConverter>... entries){
+        typeConverterMap = new HashMap<>();
+        for (AbstractMap.SimpleEntry<Class, TypeConverter> entry : entries) {
+            typeConverterMap.put(entry.getKey(),entry.getValue());
+        }
+        return this;
+    }
+
+    public SysBuilder withDomainDefintions(String... domainClasspaths){
+        this.domainDefinitionPaths = domainClasspaths;
+        return this;
+    }
+
+    public SysBuilder withFnProviderClasspaths(String... fnProviderClasspaths){
+        this.classpathsToScanForFnProviders = fnProviderClasspaths;
+        return this;
+    }
 
     public SysBuilder withAttributes(ModuleInfo moduleInfo) {
         this.moduleInfo = moduleInfo;
@@ -97,7 +115,15 @@ public class SysBuilder {
     private List<Module> getModules() {
         List<Module> modulesList = new ArrayList<>();
 
-        Module[] defaultModules = getDefaultModules();
+        List<Class> fnProviderClasses = null;
+
+        if(classpathsToScanForFnProviders != null && classpathsToScanForFnProviders.length > 0) {
+
+            fnProviderClasses = ClasspathScanner.scanForAnnotatedClasses(FnProvider.class.getName(), classpathsToScanForFnProviders);
+
+        }
+
+        Module[] defaultModules = getDefaultModules(fnProviderClasses);
 
         if(modules != null){
             for (Module module : modules) {
@@ -115,7 +141,7 @@ public class SysBuilder {
         return modulesList;
     }
 
-    private Module[] getDefaultModules() {
+    private Module[] getDefaultModules(List<Class> fnProviders) {
         return new Module[]{
                 new DefaultMainModule(moduleInfo,
                         configurationSources,
@@ -123,7 +149,7 @@ public class SysBuilder {
                         eventSinks,
                         args,
                         onStartupClasses,
-                        onExitClasses,onStartupInstances,onExitInstances)
+                        onExitClasses,onStartupInstances,onExitInstances,domainDefinitionPaths,fnProviders,typeConverterMap)
         };
     }
 

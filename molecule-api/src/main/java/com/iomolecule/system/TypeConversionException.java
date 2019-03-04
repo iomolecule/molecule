@@ -16,14 +16,24 @@
 
 package com.iomolecule.system;
 
-import lombok.Value;
+public class TypeConversionException extends Exception{
 
-@Value
-public class ParamInfo {
+    public TypeConversionException() {
+    }
 
-    private ParamDeclaration paramDeclaration;
-    private boolean available;
-    private boolean compatible;
+    public TypeConversionException(String message) {
+        super(message);
+    }
 
+    public TypeConversionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
+    public TypeConversionException(Throwable cause) {
+        super(cause);
+    }
+
+    public TypeConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

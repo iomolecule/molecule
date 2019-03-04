@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system.annotations;
+package com.iomolecule.util;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
-/**
- * This annotation should be attached to all entities which need to be uniquely identified within the molecule system.
- * The Framework uses it to uniquely identify Function instances.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.METHOD})
-public @interface Id {
+import java.util.List;
 
-    String value();
-    
+@Slf4j
+public class ClasspathScannerTests {
+
+    @Test
+    public void testSimpleClasspathScanning(){
+        List<Class> providerClasses = ClasspathScanner.scanForAnnotatedClasses("com.iomolecule.system.annotations.MethodFnProvider",
+                "com.iomolecule.util.pkg1","com.iomolecule.util.pkg2");
+
+        log.info("Providers {} ",providerClasses);
+
+
+
+    }
 }

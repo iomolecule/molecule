@@ -16,19 +16,17 @@
 
 package com.iomolecule.system.annotations;
 
+import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation should be attached to all entities which need to be uniquely identified within the molecule system.
- * The Framework uses it to uniquely identify Function instances.
+ * The Injection annotation used to look up Asynchronous Event Bus from the Molecule System.
  */
+@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.METHOD})
-public @interface Id {
-
-    String value();
-    
+@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD,ElementType.TYPE})
+public @interface MethodFnProvider {
 }

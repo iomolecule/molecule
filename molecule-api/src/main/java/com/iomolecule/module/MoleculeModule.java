@@ -23,8 +23,8 @@ import com.iomolecule.config.InputStreamConfigurationSource;
 import com.iomolecule.config.InputStreamMsgConfigSource;
 import com.iomolecule.module.annotations.ModulesInfo;
 import com.iomolecule.system.*;
-import com.iomolecule.system.annotations.LifecycleManagers;
-import com.iomolecule.system.annotations.Shells;
+import com.iomolecule.system.Param;
+import com.iomolecule.system.annotations.*;
 import com.iomolecule.util.JSONUtils;
 import com.google.common.io.ByteStreams;
 import com.google.inject.AbstractModule;
@@ -32,8 +32,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.iomolecule.config.annotations.DefaultConfigsSource;
 import com.iomolecule.config.annotations.MsgConfigsSource;
-import com.iomolecule.system.annotations.DomainOperations;
-import com.iomolecule.system.annotations.Func;
 import io.datatree.Tree;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.config.MsgConfigSource;
@@ -78,6 +76,17 @@ public abstract class MoleculeModule extends AbstractModule{
         registerConfigSourcesFromDefaultPath();
         registerMsgConfigSourcesFromDefaultPath();
         registerLifecycleManagers();
+    }
+
+    protected void registerTypeConverters(AbstractMap.SimpleEntry<Class,TypeConverter>... converterEntries){
+        MapBinder<Class,TypeConverter> typeConverterBinder = MapBinder.newMapBinder(binder(),Class.class,TypeConverter.class);
+        if(converterEntries != null && converterEntries.length > 0){
+            for (AbstractMap.SimpleEntry<Class, TypeConverter> converterEntry : converterEntries) {
+                typeConverterBinder.addBinding(converterEntry.getKey()).toInstance(converterEntry.getValue());
+            }
+
+        }
+
     }
 
     protected void registerShell(String name, Class<? extends Shell> shellImpl){
@@ -208,6 +217,16 @@ public abstract class MoleculeModule extends AbstractModule{
         for (Class<? extends Function<Param, Param>> funcClz : funcs) {
             funcSet.addBinding().to(funcClz).in(Singleton.class);
         }
+    }
+
+
+    protected void registerMethodFnProviders(Object... methodFnProviders){
+        Multibinder<Object> methodFnSet = Multibinder.newSetBinder(binder(),Object.class,MethodFnProvider.class);
+
+        for (Object methodFnProvider : methodFnProviders) {
+            methodFnSet.addBinding().toInstance(methodFnProvider);
+        }
+
     }
 
     protected List<Operation> getOperations(String fileInClasspath) throws Exception {

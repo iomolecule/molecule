@@ -16,16 +16,12 @@
 
 package com.iomolecule.util;
 
-import com.iomolecule.system.Param;
-import com.iomolecule.system.annotations.In;
-import com.iomolecule.system.annotations.Out;
-import com.iomolecule.system.annotations.ParamDecl;
 import com.github.krukow.clj_ds.PersistentMap;
 import com.github.krukow.clj_lang.PersistentHashMap;
-import com.iomolecule.system.DefaultParamDeclaration;
-import com.iomolecule.system.ParamDeclaration;
+import com.iomolecule.system.*;
+import com.iomolecule.system.Param;
 import com.iomolecule.system.annotations.*;
-import com.iomolecule.system.annotations.*;
+import com.iomolecule.system.services.TypeConversionService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,12 +37,107 @@ public class FnUtils {
     public static final String AVAILABLE_PARAMS = "available-params";
     public static final String NON_AVAILABLE_PARAMS = "non-available-params";
 
+
     public static URI toURI(String val){
         try {
             return new URI(val);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static Object[] extractArgs(List<ParamDeclaration> paramDeclarationList,Param param){
+        Object[] args = new Object[paramDeclarationList.size()];
+
+        for (int i=0;i<paramDeclarationList.size();i++) {
+            ParamDeclaration paramDeclaration = paramDeclarationList.get(i);
+            if(param.containsKey(paramDeclaration.getKey())){
+                args[i] = param.get(paramDeclaration.getKey());
+            }else if(!paramDeclaration.isMandatory()){
+                args[i] = null;
+            }else{
+                String message = String.format("Parameter no %d with key %s is missing form the param map which is mandatory",i,paramDeclaration.getKey());
+                throw new RuntimeException(message);
+            }
+        }
+
+        return args;
+    }
+
+    public static Param fillReturnParam(Param param,ParamDeclaration returnParamDeclaration,Object returnVal){
+        Param retVal = param;
+        if(returnParamDeclaration.isMandatory()){
+            if(returnVal == null){
+                String message = String.format("Return Param key %s is mandatory and seems to be null which is not allowed",returnParamDeclaration.getKey());
+                throw new RuntimeException(message);
+            }
+        }
+
+        retVal = retVal.plus(returnParamDeclaration.getKey(),returnVal);
+
+        return retVal;
+    }
+
+
+    public static List<ParamInfo> getNonAvailableParams(Param param, List<ParamDeclaration> paramInfos){
+        List<ParamInfo> nonAvailableParams = new ArrayList<>();
+        for (ParamDeclaration paramInfo : paramInfos) {
+            String key = paramInfo.getKey();
+            Class typ = paramInfo.getType();
+
+
+            if(param.containsKey(key)){
+                //check type
+                if(!isCompatibleType(param.get(key),typ)){
+                    nonAvailableParams.add(new ParamInfo(paramInfo,true,false));
+                }
+            }else{
+                nonAvailableParams.add(new ParamInfo(paramInfo,false,false));
+            }
+        }
+
+        return nonAvailableParams;
+
+    }
+
+    public static List<ParamInfo> getNonAvailableMandatoryParams(Param param,List<ParamDeclaration> paramInfos){
+        List<ParamInfo> allNonAvailableParams = getNonAvailableParams(param,paramInfos);
+
+        List<ParamInfo> allNonAvailableMandatoryParams = new ArrayList<>();
+
+        for (ParamInfo nonAvailableParam : allNonAvailableParams) {
+            if(nonAvailableParam.getParamDeclaration().isMandatory()){
+                allNonAvailableMandatoryParams.add(nonAvailableParam);
+            }
+        }
+
+        return allNonAvailableMandatoryParams;
+    }
+
+    public static List<ParamInfo> getNonAvailableOptionalParams(Param param,List<ParamDeclaration> paramInfos){
+        List<ParamInfo> allNonAvailableParams = getNonAvailableParams(param,paramInfos);
+
+        List<ParamInfo> allNonAvailableOptionalParams = new ArrayList<>();
+
+        for (ParamInfo nonAvailableParam : allNonAvailableParams) {
+            if(!nonAvailableParam.getParamDeclaration().isMandatory()){
+                allNonAvailableOptionalParams.add(nonAvailableParam);
+            }
+        }
+
+        return allNonAvailableOptionalParams;
+    }
+
+    private static boolean isCompatibleType(Object o, Class paramExpectedType) {
+        boolean retVal = false;
+        Class paramActualType = o.getClass();
+
+        if(paramExpectedType.isAssignableFrom(paramActualType)){
+            retVal = true;
+        }
+
+        return retVal;
     }
 
     public static URI getURI(Class clz) throws URISyntaxException {
@@ -131,6 +222,24 @@ public class FnUtils {
         }
 
         return in;
+    }
+
+    public static Param convertToTargetTypes(TypeConversionService typeConversionService, Param in, List<ParamDeclaration> inParamDeclaration) throws TypeConversionException {
+        Param outParam = in;
+        for (ParamDeclaration paramDeclaration : inParamDeclaration) {
+            if(in.containsKey(paramDeclaration.getKey())){
+                Object value = in.get(paramDeclaration.getKey());
+                if(!isCompatibleType(value,paramDeclaration.getType())){
+                    Object convertedValue = typeConversionService.convert(value,paramDeclaration.getType());
+                    outParam = outParam.plus(paramDeclaration.getKey(),convertedValue);
+                }
+            }else if(paramDeclaration.isMandatory()){
+                String message = String.format("Param %s is mandatory which is missing in the param map",paramDeclaration.getKey());
+                throw new RuntimeException(message);
+            }
+        }
+        return outParam;
+
     }
 
     public static Param mapOutParams(Param in, List<ParamDeclaration> outParams,String mapToParamKey){

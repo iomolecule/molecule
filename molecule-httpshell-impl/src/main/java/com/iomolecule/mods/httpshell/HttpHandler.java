@@ -153,7 +153,7 @@ class HttpHandler implements io.undertow.server.HttpHandler{
 
             if(requestMethod.equalToString("POST") || requestMethod.equalToString("PUT")){
                 requestBody = readBody(httpServerExchange);
-                Map map = OBJECT_MAPPER.convertValue(requestBody, Map.class);
+                Map map = OBJECT_MAPPER.readValue(requestBody, Map.class);
                 requestMap.putAll(map);
             }
 

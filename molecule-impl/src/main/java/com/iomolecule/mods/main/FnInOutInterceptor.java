@@ -17,24 +17,36 @@
 package com.iomolecule.mods.main;
 
 import com.iomolecule.commons.Constants;
-import com.iomolecule.system.Fn;
-import com.iomolecule.system.FnInterceptor;
-import com.iomolecule.system.Param;
-import com.iomolecule.system.ParamDeclaration;
+import com.iomolecule.system.*;
+import com.iomolecule.system.services.TypeConversionService;
 import com.iomolecule.util.FnUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 class FnInOutInterceptor implements FnInterceptor{
+
+    private TypeConversionService conversionService;
+
+    FnInOutInterceptor(TypeConversionService typeConversionService){
+        Objects.requireNonNull(typeConversionService,"type conversion service");
+        this.conversionService = typeConversionService;
+    }
 
     @Override
     public Param before(Fn fn, Param input) {
         List<ParamDeclaration> inDeclarations = fn.getInDeclarations();
         System.out.println("Before fn "+fn);
         input = FnUtils.verifyInParams(input, inDeclarations);
-        return input;
+        Param output = null;
+        try {
+            output = FnUtils.convertToTargetTypes(conversionService,input, inDeclarations);
+        } catch (TypeConversionException e) {
+           throw new RuntimeException(e);
+        }
+        return output;
     }
 
     @Override

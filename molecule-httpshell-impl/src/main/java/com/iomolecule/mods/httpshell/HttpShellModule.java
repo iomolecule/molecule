@@ -26,6 +26,7 @@ import com.iomolecule.shell.http.HttpShellConfig;
 import com.iomolecule.shell.http.MediaType;
 import com.iomolecule.shell.http.annotations.SupportedMediaTypes;
 import com.iomolecule.system.LifecycleManager;
+import com.iomolecule.system.annotations.MethodFnProvider;
 
 import javax.inject.Singleton;
 import java.util.AbstractMap;
@@ -77,4 +78,10 @@ public class HttpShellModule extends MoleculeModule {
         return MediaType.APPLICATION_JSON;
     }
 
+    @ProvidesIntoSet
+    @MethodFnProvider
+    @Singleton
+    public Object provideHttpShellFnProvider(HttpShellConfig config){
+        return new HttpShellFnProvider(config);
+    }
 }

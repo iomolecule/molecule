@@ -17,8 +17,11 @@
 package com.iomolecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Injector;
 import com.iomolecule.system.*;
+import com.iomolecule.system.annotations.Id;
 import com.iomolecule.system.services.FnInterceptionService;
+import com.iomolecule.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.commons.Constants;
 import com.iomolecule.config.MsgConfigSource;
@@ -26,6 +29,7 @@ import com.iomolecule.system.services.FnBus;
 import com.iomolecule.util.FnUtils;
 import com.iomolecule.util.JSONUtils;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -44,11 +48,15 @@ class DefaultFnBus implements FnBus{
     private Set<List<Fn>> fnsSets;
     private Set<Function<Param,Param>> functionSet;
 
+    private Set<Object> methodFnProviders;
+    private Set<Object> fnProviders;
+
     private EventBus eventBus;
 
     private URI uri;
 
     private Map<URI,Fn> fnMap;
+
 
     private boolean started;
 
@@ -61,6 +69,8 @@ class DefaultFnBus implements FnBus{
 
     private FnInterceptionService fnInterceptionService;
 
+    private Injector injector;
+
 
     DefaultFnBus(Set<Fn> fnSet,
                  EventBus eventBus,
@@ -99,11 +109,13 @@ class DefaultFnBus implements FnBus{
         }
     }
 
-    DefaultFnBus(Set<Fn> fnSet,
+    DefaultFnBus(Injector injector, Set<Fn> fnSet,
                  Set<List<Fn>> fnSets,
                  Set<Function<Param,Param>> functionSet,
+                 Set<Object> methodFnProviders,
+                 Set<Object> fnProviderClasses,
                  EventBus eventBus,
-                 MsgConfigSource messageConfigProvider,FnInterceptionService fnInterceptionService){
+                 MsgConfigSource messageConfigProvider, FnInterceptionService fnInterceptionService){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -112,6 +124,9 @@ class DefaultFnBus implements FnBus{
         this.eventBus = eventBus;
         this.messageConfigProvider = messageConfigProvider;
         this.fnInterceptionService = fnInterceptionService;
+        this.methodFnProviders = methodFnProviders;
+        this.fnProviders = fnProviderClasses;
+        this.injector = injector;
         try {
             uri = new URI(String.format("%s://%s", FUNCTION_SCHEME, FNBUS_NAME));
         }catch(Exception e){
@@ -214,6 +229,7 @@ class DefaultFnBus implements FnBus{
                 //outParam = FnUtils.mapOutParams(outParam,fnToInvoke.getOutDeclarations(), Constants.OUT_PARAMS);
                 return outParam;
             }catch(Exception e){
+                e.printStackTrace();
                 return handleException(e,param);
             }
         }else{
@@ -274,11 +290,85 @@ class DefaultFnBus implements FnBus{
 
             }
 
+            if(methodFnProviders != null && !methodFnProviders.isEmpty()){
+
+                List<Fn> listOfFns = getListOfFnsFromMethodFnProviders(methodFnProviders);
+
+                for (Fn fn : listOfFns) {
+                    log.debug("Processing Fn {}",fn.getURI());
+
+                    fnMap.put(fn.getURI(),fn);
+                }
+
+            }
+
+            if(fnProviders != null && !fnProviders.isEmpty()){
+                List<Fn> listOfFns = getListOfFnsFromFnProviders(fnProviders);
+
+                for (Fn fn : listOfFns) {
+                    log.debug("Processing Fn {}",fn.getURI());
+
+                    fnMap.put(fn.getURI(),fn);
+                }
+
+            }
+
             //start the interception service
             if(fnInterceptionService != null){
                 fnInterceptionService.start();
             }
         }
+    }
+
+    private List<Fn> getListOfFnsFromFnProviders(Set<Object> fnProviders) {
+        List<Fn> fnList = new ArrayList<>();
+
+        for (Object fnProvider : fnProviders) {
+
+            List<Fn> fnsFromObject = getFnsFromObject(fnProvider);
+
+            //Object instance = injector.getInstance(fnProvider);
+            fnList.addAll(fnsFromObject);
+        }
+
+        return fnList;
+    }
+
+    private List<Fn> getListOfFnsFromMethodFnProviders(Set<Object> methodFnProviders) {
+        List<Fn> fnList = new ArrayList<>();
+
+        for (Object methodFnProvider : methodFnProviders) {
+            List<Method> listOfFnProviderMethods = ReflectionUtils.getListOfFnProviderMethods(methodFnProvider, Id.class);
+            for (Method providerMethod : listOfFnProviderMethods) {
+                Fn methodFn = methodToFn(methodFnProvider,providerMethod);
+                fnList.add(methodFn);
+            }
+
+        }
+
+        return fnList;
+    }
+
+    private List<Fn> getFnsFromObject(Object obj){
+        List<Fn> fnList = new ArrayList<>();
+        List<Method> listOfFnProviderMethods = ReflectionUtils.getListOfFnProviderMethods(obj, Id.class);
+        for (Method providerMethod : listOfFnProviderMethods) {
+            Fn methodFn = methodToFn(obj,providerMethod);
+            fnList.add(methodFn);
+        }
+        return fnList;
+    }
+
+    private Fn methodToFn(Object providerObject,Method providerMethod) {
+
+        Id idAnnotation = providerMethod.getAnnotation(Id.class);
+
+        List<ParamDeclaration> argumentsInfo = ReflectionUtils.getArgumentInfo(providerObject, providerMethod);
+        ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(providerObject, providerMethod);
+
+        MethodFn methodFn = new MethodFn(providerObject,providerMethod,idAnnotation.value(),argumentsInfo,returnInfo);
+
+        return methodFn;
     }
 
     private List<Fn> getListOfFnsFromFunctions(Set<Function<Param, Param>> functionLists) {

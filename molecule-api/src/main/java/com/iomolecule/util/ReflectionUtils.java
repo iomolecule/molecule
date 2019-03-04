@@ -16,24 +16,45 @@
 
 package com.iomolecule.util;
 
-import com.iomolecule.system.ParamInfo;
-import com.iomolecule.system.annotations.Param;
+import com.iomolecule.commons.Constants;
+import com.iomolecule.system.DefaultParamDeclaration;
+import com.iomolecule.system.ParamDeclaration;
+import lombok.extern.slf4j.Slf4j;
+
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class ReflectionUtils {
 
 
-    public static List<ParamInfo> getArgumentInfo(Object object, Method method){
+    public static List<Method> getListOfFnProviderMethods(Object object, Class<? extends Annotation> annotationClz){
+        Objects.requireNonNull(object,"object");
+        Method[] declaredMethods = object.getClass().getDeclaredMethods();
+
+        List<Method> applicableMethods = new ArrayList<>();
+
+        for (Method declaredMethod : declaredMethods) {
+            if(declaredMethod.isAnnotationPresent(annotationClz) && (!declaredMethod.getReturnType().equals(Void.TYPE))){
+                applicableMethods.add(declaredMethod);
+            }
+        }
+
+        return applicableMethods;
+    }
+
+    public static List<ParamDeclaration> getArgumentInfo(Object object, Method method){
         Objects.requireNonNull(object,"object");
         Objects.requireNonNull(method,"method");
 
-        List<ParamInfo> paramInfos = new ArrayList<>();
+        List<ParamDeclaration> paramInfos = new ArrayList<>();
 
         int paramCount = method.getParameterCount();
 
@@ -41,7 +62,7 @@ public class ReflectionUtils {
             Parameter[] parameters = method.getParameters();
 
             for (Parameter parameter : parameters) {
-                ParamInfo paramInfo = getParamInfo(parameter);
+                ParamDeclaration paramInfo = getParamInfo(parameter);
                 paramInfos.add(paramInfo);
             }
 
@@ -50,29 +71,53 @@ public class ReflectionUtils {
         return paramInfos;
     }
 
-    private static ParamInfo getParamInfo(Parameter parameter) {
-        Param annotation = parameter.getAnnotation(Param.class);
-        ParamInfo paramInfo = null;
-        if(annotation != null){
+    private static ParamDeclaration getParamInfo(Parameter parameter) {
+        Named namedAnnotation = parameter.getAnnotation(Named.class);
 
-        }else{
-            Nonnull nonNullParam = parameter.getAnnotation(Nonnull.class);
-            boolean mandatory = false;
-            if(nonNullParam != null){
-                mandatory = true;
-            }
-           // new ParamInfo()
-           // paramInfo = new ParamInfo(parameter.getName(),parameter.getType(),)
+        String paramName = parameter.getName();
+        boolean mandatory = false;
+        Class<?> dataType = null;
+
+        if(namedAnnotation != null){
+            //annotation is given precedence
+            paramName = namedAnnotation.value();
         }
-        return null;
+
+        Nonnull nonNullParam = parameter.getAnnotation(Nonnull.class);
+
+        if(nonNullParam != null){
+            mandatory = true;
+        }
+
+        dataType = parameter.getType();
+
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory);
+
+        return paramInfo;
     }
 
-    public static ParamInfo getReturnInfo(Object object,Method method){
+    public static ParamDeclaration getReturnInfo(Object object,Method method){
         Objects.requireNonNull(object,"object");
         Objects.requireNonNull(method,"method");
 
-        ParamInfo paramInfo = null;
+        String paramName = Constants.OUT_PARAMS;
+        boolean mandatory = false;
+        Class<?> dataType = method.getReturnType();
 
+        Nonnull returnNonNull = method.getAnnotation(Nonnull.class);
+
+        Named namedAnnotation = method.getAnnotation(Named.class);
+
+        if(namedAnnotation != null){
+            //annotation is given precedence
+            paramName = namedAnnotation.value();
+        }
+
+        if(returnNonNull != null){
+            mandatory = true;
+        }
+
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory);
 
         return paramInfo;
     }
