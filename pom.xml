@@ -33,6 +33,7 @@
         <module>molecule-httpshell-impl</module>
         <module>molecule-jongo-api</module>
         <module>molecule-jongo-impl</module>
+        <module>molecule-cmdshell-impl</module>
     </modules>
 
     <properties>
