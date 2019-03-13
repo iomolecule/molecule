@@ -32,7 +32,7 @@ public class ReflectionUtilTests {
     public void testSimpleMethodReflection(){
 
         List<ParamDeclaration> addValuesOptionalInputs = ReflectionUtils.getArgumentInfo(this,
-                pickMethod(this.getClass(), "addValuesOptionalInputs"));
+                pickMethod(this.getClass(), "addValuesOptionalInputs"),null);
 
         ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(this,pickMethod(this.getClass(),"addValuesOptionalInputs"));
 
@@ -45,7 +45,7 @@ public class ReflectionUtilTests {
     public void testSimpleMethodReflectionMandatory(){
 
         List<ParamDeclaration> addValuesOptionalInputs = ReflectionUtils.getArgumentInfo(this,
-                pickMethod(this.getClass(), "addValuesMandatoryInputs"));
+                pickMethod(this.getClass(), "addValuesMandatoryInputs"),null);
 
         ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(this,pickMethod(this.getClass(),"addValuesMandatoryInputs"));
 
@@ -58,7 +58,7 @@ public class ReflectionUtilTests {
     public void testSimpleMethodReflectionMandatoryReturn(){
 
         List<ParamDeclaration> addValuesOptionalInputs = ReflectionUtils.getArgumentInfo(this,
-                pickMethod(this.getClass(), "addValuesMandatoryInputsAndOutput"));
+                pickMethod(this.getClass(), "addValuesMandatoryInputsAndOutput"),null);
 
         ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(this,pickMethod(this.getClass(),"addValuesMandatoryInputsAndOutput"));
 
@@ -71,7 +71,7 @@ public class ReflectionUtilTests {
     public void testSimpleMethodReflectionNoAnnotations(){
 
         List<ParamDeclaration> addValuesOptionalInputs = ReflectionUtils.getArgumentInfo(this,
-                pickMethod(this.getClass(), "addValueNoAnnotations"));
+                pickMethod(this.getClass(), "addValueNoAnnotations"),null);
 
         ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(this,pickMethod(this.getClass(),"addValueNoAnnotations"));
 

@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system;
+package com.iomolecule.system.annotations;
 
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * The Default implementation of {@link ParamDeclaration}
+ * The annotation is used to group all the {@link ParamDecl}
+ * for a given Function as In params.
+ *
  */
-@Value
-public class DefaultParamDeclaration implements ParamDeclaration{
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD,ElementType.PARAMETER})
+public @interface DefaultValue {
 
-    private String key;
-    private Class type;
-    private boolean mandatory;
-    private Object defaultValue;
-
-
-    @Override
-    public boolean hasDefaultValue(){
-        return defaultValue != null;
-    }
+   String value();
+    
 }

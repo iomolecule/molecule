@@ -96,7 +96,7 @@ class JLineInteractiveShell implements Shell {
 
         while (active && (line = readLine(reader, defaultPrompt)) != null) {
 
-            List<String> input = splitter.splitToList(line);
+            List<String> input = doSplit(line);//splitter.splitToList(line);
             if(input != null && !input.isEmpty()) {
                 String command = input.get(0);
                 List<String> commandArguments = new ArrayList();
@@ -133,6 +133,18 @@ class JLineInteractiveShell implements Shell {
 
     }
 
+    private List<String> doSplit(String line) {
+        String[] splitOut = line.split(" ", 2);
+        List<String> splitOutput = new ArrayList<>();
+        if(splitOut != null && splitOut.length > 0){
+            for (String splitContent : splitOut) {
+                splitOutput.add(splitContent.trim());
+            }
+
+        }
+        return splitOutput;
+    }
+
     private boolean executeCommandOnFnBus(String command,List<String> args) {
         boolean shouldContinue = true;
         try {
@@ -157,14 +169,57 @@ class JLineInteractiveShell implements Shell {
             //log.debug("Operation {}",operation);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
+            inParam = fillParams(inParam,args);
             //log.debug("In Params {}",inParam);
             Param outParam = fnBus.apply(inParam);
-            if(outParam.hasOutParams()){
+            if(outParam.hasOutParams() || outParam.containsKey(Constants.STATUS)){
                 prettyPrintOutput(outParam);
             }
         }else{
             throw new InvalidOperationException(String.format("Operation %s is invalid for domain %s",command,fullyQualifiedCurrentDomain));
         }
+    }
+
+    private Param fillParams(Param inParam, List<String> args) {
+        if(args == null || args.isEmpty()){
+            return inParam;
+        }
+        String operationParams = null;
+        operationParams = args.get(0);
+
+        log.debug("Params {}",operationParams);
+
+        if(operationParams != null) {
+            //log.debug("PREQUOTE IN {}", operationParams);
+            //String opParams = quoteParams(operationParams);
+            //String opParams = unQuoteParams(operationParams);
+            //log.debug("MVEL IN {}", opParams);
+
+            try {
+                Object expressionObj = MVEL.eval(operationParams);
+                //printf("Params %s, %s", expressionObj.getClass(), expressionObj);
+                if (expressionObj instanceof Map) {
+                    Map paramMap = (Map) expressionObj;
+                    Set keySet = paramMap.keySet();
+
+                    for (Object key : keySet) {
+                        Object value = paramMap.get(key);
+                        inParam = inParam.plus((String) key, value);
+                    }
+
+
+                } else {
+                    String message = String.format("Unsupported command param data structure %s, only Map expressions are supported at present", expressionObj.getClass());
+                    throw new RuntimeException(message);
+                }
+            }catch(Exception e){
+                //if we get an exception when evaluating the expression
+                //as an MVEL expression, we can pass the argument as is to let the function handle as is
+                inParam = inParam.plus(Constants.IN_PARAMS,operationParams);
+            }
+        }
+
+        return inParam;
     }
 
     private boolean executeCommandOnRootDomain(String command,List<String> args) throws InvalidOperationException {
@@ -174,7 +229,7 @@ class JLineInteractiveShell implements Shell {
             Operation operation = domainService.getOperation(command);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
-            inParam = inParam.plus(Constants.IN_PARAMS,args);
+            inParam = fillParams(inParam,args);
             Param outParam = fnBus.apply(inParam);
             if(outParam.containsKey(IShellConstants.EXIT_SYSTEM)){
                 retVal = (Boolean)outParam.get(IShellConstants.EXIT_SYSTEM);
@@ -344,8 +399,8 @@ class JLineInteractiveShell implements Shell {
                 String opParams = unQuoteParams(operationParams);
                 //log.debug("MVEL IN {}", opParams);
 
-                Object expressionObj = MVEL.eval(opParams);
-                printf("Params %s, %s", expressionObj.getClass(), expressionObj);
+                    Object expressionObj = MVEL.eval(operationParams);
+                    printf("Params %s, %s", expressionObj.getClass(), expressionObj);
                 Operation operation = domainService.getOperationAt(fullyQualifiedDomainName,operationName);
                 URI functionURI = operation.getFunctionURI();
                 printf("About to invoke function %s",functionURI);

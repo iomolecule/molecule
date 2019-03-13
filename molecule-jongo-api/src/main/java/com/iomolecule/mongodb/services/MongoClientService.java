@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system;
+package com.iomolecule.mongodb.services;
 
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import com.mongodb.DB;
 
-/**
- * The Default implementation of {@link ParamDeclaration}
- */
-@Value
-public class DefaultParamDeclaration implements ParamDeclaration{
+import java.util.List;
 
-    private String key;
-    private Class type;
-    private boolean mandatory;
-    private Object defaultValue;
+public interface MongoClientService {
 
+    public void start();
 
-    @Override
-    public boolean hasDefaultValue(){
-        return defaultValue != null;
-    }
+    public DB getDB(String name);
+
+    public boolean hasDB(String name);
+
+    public List<String> getDBNames();
+
+    public void stop();
 }

@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system;
+package com.iomolecule.system.services;
 
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import com.iomolecule.module.ModuleInfo;
 
-/**
- * The Default implementation of {@link ParamDeclaration}
- */
-@Value
-public class DefaultParamDeclaration implements ParamDeclaration{
+public interface ModuleInfoService {
 
-    private String key;
-    private Class type;
-    private boolean mandatory;
-    private Object defaultValue;
+    public void start();
 
+    public ModuleInfo getModuleInfo(String name);
 
-    @Override
-    public boolean hasDefaultValue(){
-        return defaultValue != null;
-    }
+    public boolean hasModuleWithName(String name);
+
+    public void stop();
 }

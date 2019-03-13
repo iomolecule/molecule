@@ -19,6 +19,9 @@ package com.iomolecule.util;
 import com.iomolecule.commons.Constants;
 import com.iomolecule.system.DefaultParamDeclaration;
 import com.iomolecule.system.ParamDeclaration;
+import com.iomolecule.system.TypeConversionException;
+import com.iomolecule.system.annotations.DefaultValue;
+import com.iomolecule.system.services.TypeConversionService;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -50,7 +53,7 @@ public class ReflectionUtils {
         return applicableMethods;
     }
 
-    public static List<ParamDeclaration> getArgumentInfo(Object object, Method method){
+    public static List<ParamDeclaration> getArgumentInfo(Object object, Method method,TypeConversionService typeConversionService){
         Objects.requireNonNull(object,"object");
         Objects.requireNonNull(method,"method");
 
@@ -62,7 +65,7 @@ public class ReflectionUtils {
             Parameter[] parameters = method.getParameters();
 
             for (Parameter parameter : parameters) {
-                ParamDeclaration paramInfo = getParamInfo(parameter);
+                ParamDeclaration paramInfo = getParamInfo(parameter,typeConversionService);
                 paramInfos.add(paramInfo);
             }
 
@@ -71,7 +74,7 @@ public class ReflectionUtils {
         return paramInfos;
     }
 
-    private static ParamDeclaration getParamInfo(Parameter parameter) {
+    private static ParamDeclaration getParamInfo(Parameter parameter,TypeConversionService typeConversionService) {
         Named namedAnnotation = parameter.getAnnotation(Named.class);
 
         String paramName = parameter.getName();
@@ -91,7 +94,20 @@ public class ReflectionUtils {
 
         dataType = parameter.getType();
 
-        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory);
+        DefaultValue defaultValueAnnotation = parameter.getAnnotation(DefaultValue.class);
+
+        Object defaultVal = null;
+
+        if(defaultValueAnnotation != null && typeConversionService != null){
+            try {
+                defaultVal = typeConversionService.convert(defaultValueAnnotation.value(),dataType);
+            } catch (TypeConversionException e) {
+
+                log.warn("Failed to convert {} to type {}",defaultValueAnnotation.value(),dataType);
+            }
+        }
+
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,defaultVal);
 
         return paramInfo;
     }
@@ -117,7 +133,7 @@ public class ReflectionUtils {
             mandatory = true;
         }
 
-        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory);
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,null);
 
         return paramInfo;
     }

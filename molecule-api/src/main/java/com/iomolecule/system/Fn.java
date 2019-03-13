@@ -52,4 +52,7 @@ public interface Fn extends Function<Param,Param> {
     public default List<ParamDeclaration> getInDeclarations(){
         return new ArrayList<>();
     }
+
+
+
 }

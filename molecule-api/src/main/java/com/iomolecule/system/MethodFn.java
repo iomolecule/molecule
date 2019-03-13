@@ -77,7 +77,12 @@ public class MethodFn implements Fn{
             throw new RuntimeException(e);
             //e.printStackTrace();
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            Throwable cause = e.getCause();
+            if(cause != null && cause.getMessage() != null){
+                throw new RuntimeException(cause.getMessage());
+            }else {
+                throw new RuntimeException(e.getCause());
+            }
             //e.printStackTrace();
         }
 

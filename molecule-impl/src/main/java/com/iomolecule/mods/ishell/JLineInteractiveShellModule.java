@@ -43,6 +43,9 @@ public class JLineInteractiveShellModule extends MoleculeModule{
         shellMapBinder.addBinding("shell://interactive/jline").to(JLineInteractiveShell.class);*/
         registerShell("shell://interactive/jline",JLineInteractiveShell.class);
         registerFuncs();
+
+        registerFnProviders(InteractiveShellFunctions.class);
+
     }
 
     private void registerFuncs() {
@@ -53,8 +56,9 @@ public class JLineInteractiveShellModule extends MoleculeModule{
                 ListOperationsFunction.class,
                 GetPresentWorkingDomainFunction.class,
                 ChangeDomainFunction.class,
-                ListModulesFunction.class,
-                AboutModuleFunction.class);
+                ListModulesFunction.class);//,
+                //AboutModuleFunction.class);
+
 
     }
 

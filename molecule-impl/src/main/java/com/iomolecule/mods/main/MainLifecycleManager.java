@@ -17,14 +17,11 @@
 package com.iomolecule.mods.main;
 
 import com.google.common.eventbus.EventBus;
+import com.iomolecule.system.services.*;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.system.LifecycleException;
 import com.iomolecule.system.LifecycleManager;
 import com.iomolecule.system.annotations.AsyncEventBus;
-import com.iomolecule.system.services.DomainService;
-import com.iomolecule.system.services.EventsService;
-import com.iomolecule.system.services.FnBus;
-import com.iomolecule.system.services.SysLifecycleCallbackService;
 
 import javax.inject.Inject;
 
@@ -37,6 +34,7 @@ class MainLifecycleManager implements LifecycleManager{
     private EventsService eventSinkRegistrationService;
     private SysLifecycleCallbackService sysLifecycleCallbackService;
     private DomainService domainService;
+    private ModuleInfoService moduleInfoService;
     private FnBus fnBus;
     boolean started;
 
@@ -44,7 +42,7 @@ class MainLifecycleManager implements LifecycleManager{
     MainLifecycleManager(@AsyncEventBus EventBus eventBus,
                          EventsService eventSinkRegistrationService,
                          SysLifecycleCallbackService sysLifecycleCallbackService,
-                         DomainService domainService,FnBus fnBus){
+                         DomainService domainService,FnBus fnBus,ModuleInfoService moduleInfoService){
         checkArgument(eventBus != null,"EventBus cannot be null!");
         checkArgument(eventSinkRegistrationService != null,"EventSinkRegistration Service cannot be null!");
         this.eventBus = eventBus;
@@ -52,7 +50,7 @@ class MainLifecycleManager implements LifecycleManager{
         this.sysLifecycleCallbackService = sysLifecycleCallbackService;
         this.domainService = domainService;
         this.fnBus = fnBus;
-
+        this.moduleInfoService = moduleInfoService;
     }
 
     @Override
@@ -88,6 +86,11 @@ class MainLifecycleManager implements LifecycleManager{
 
         log.debug("Starting lifecycle of services...");
 
+        eventBus.post("MODULEINFO_SERVICE_STARTING");
+
+        moduleInfoService.start();
+
+        eventBus.post("MODULEINFO_SERVICE_STARTED");
 
 
         eventBus.post("STARTED_SYS");
@@ -112,6 +115,8 @@ class MainLifecycleManager implements LifecycleManager{
 
             eventBus.post("STOPPING_SYS");
 
+            moduleInfoService.stop();
+
             if (eventSinkRegistrationService.hasAnyEventSinks()) {
                 for (Object eventSink : eventSinkRegistrationService.getAllEventSinks()) {
                     log.debug("UnRegistering event sink {}", eventSink);
@@ -122,6 +127,7 @@ class MainLifecycleManager implements LifecycleManager{
             sysLifecycleCallbackService.invokeAllExitCallbacks();
 
             domainService.stop();
+
 
             fnBus.stop();
             log.debug("Sys Stop completed...");

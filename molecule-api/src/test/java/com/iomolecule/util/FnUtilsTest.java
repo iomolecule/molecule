@@ -30,8 +30,8 @@ public class FnUtilsTest {
     public void testParamMapping(){
         Param in = getSampleParam();
         List<ParamDeclaration> outParamDeclaration = CollectionUtils.LIST(ParamDeclaration.class,
-                new DefaultParamDeclaration("key1",String.class,true),
-                new DefaultParamDeclaration("key2",Integer.class,true));
+                new DefaultParamDeclaration("key1",String.class,true,null),
+                new DefaultParamDeclaration("key2",Integer.class,true,null));
 
         Param out = FnUtils.mapOutParams(in, outParamDeclaration, "OUT");
 
@@ -42,8 +42,8 @@ public class FnUtilsTest {
     public void testMissingMandatoryParams(){
         Param in = getSampleParam();
         List<ParamDeclaration> outParamDeclaration = CollectionUtils.LIST(ParamDeclaration.class,
-                new DefaultParamDeclaration("key1",String.class,true),
-                new DefaultParamDeclaration("key3",Integer.class,true));
+                new DefaultParamDeclaration("key1",String.class,true,null),
+                new DefaultParamDeclaration("key3",Integer.class,true,null));
 
         Param out = FnUtils.mapOutParams(in, outParamDeclaration, "OUT");
 
@@ -54,8 +54,8 @@ public class FnUtilsTest {
     public void testMissingOptionalParams(){
         Param in = getSampleParam();
         List<ParamDeclaration> outParamDeclaration = CollectionUtils.LIST(ParamDeclaration.class,
-                new DefaultParamDeclaration("key1",String.class,true),
-                new DefaultParamDeclaration("key3",Integer.class,false));
+                new DefaultParamDeclaration("key1",String.class,true,null),
+                new DefaultParamDeclaration("key3",Integer.class,false,null));
 
         Param out = FnUtils.mapOutParams(in, outParamDeclaration, "OUT");
 
@@ -76,8 +76,8 @@ public class FnUtilsTest {
     public void testMandatoryInParams(){
         Param in = getSampleParam();
         List<ParamDeclaration> inParamDeclaration = CollectionUtils.LIST(ParamDeclaration.class,
-                new DefaultParamDeclaration("key1",String.class,true),
-                new DefaultParamDeclaration("key3",Integer.class,false));
+                new DefaultParamDeclaration("key1",String.class,true,null),
+                new DefaultParamDeclaration("key3",Integer.class,false,null));
 
         Param out = FnUtils.verifyInParams(in,inParamDeclaration);
 
@@ -89,8 +89,8 @@ public class FnUtilsTest {
     public void testMissingMandatoryInParams(){
         Param in = getSampleParam();
         List<ParamDeclaration> outParamDeclaration = CollectionUtils.LIST(ParamDeclaration.class,
-                new DefaultParamDeclaration("key1",String.class,true),
-                new DefaultParamDeclaration("key3",Integer.class,true));
+                new DefaultParamDeclaration("key1",String.class,true,null),
+                new DefaultParamDeclaration("key3",Integer.class,true,null));
 
         Param out = FnUtils.verifyInParams(in,outParamDeclaration);
 

@@ -38,6 +38,7 @@ import com.iomolecule.config.annotations.DefaultConfigsSource;
 import com.iomolecule.config.annotations.MsgConfigsSource;
 import com.iomolecule.module.ModuleInfo;
 import com.iomolecule.module.MoleculeModule;
+import com.iomolecule.module.annotations.ModulesInfo;
 import com.iomolecule.system.*;
 import com.iomolecule.system.Param;
 import com.iomolecule.system.annotations.*;
@@ -46,10 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -140,6 +138,11 @@ public class DefaultMainModule extends MoleculeModule{
         registerDomainOperationsForSystem();
 
         registerFnProviders();
+
+        registerTypeConverters(new AbstractMap.SimpleEntry<>(Integer.class,new IntegerTypeConverter()),
+                new AbstractMap.SimpleEntry<>(String.class,new StringTypeConverter()),
+                new AbstractMap.SimpleEntry<>(Float.class,new FloatTypeConverter()),
+                new AbstractMap.SimpleEntry<>(Double.class,new DoubleTypeConverter()));
     }
 
     private void bindTypeConverters() {
@@ -383,16 +386,22 @@ public class DefaultMainModule extends MoleculeModule{
 
     @Provides
     @Singleton
+    public ModuleInfoService provideModuleInfoService(@ModulesInfo Set<ModuleInfo> moduleInfoSet){
+        return new ModuleInfoServiceImpl(moduleInfoSet);
+    }
+
+    @Provides
+    @Singleton
     public FnBus provideDefaultFnBus(Injector injector, @Fun Set<Fn> fns, @Funs Set<List<Fn>> fnsList,
                                      @Func Set<Function<Param,Param>> functions,
                                      @AsyncEventBus EventBus eventBus,
                                      @MethodFnProvider Set<Object> methodFnProviders,
                                      @FnProvider Set<Object> fnProviderClasses,
                                      FnInterceptionService fnInterceptionService,
-                                     MsgConfigSource msgConfigSource){
+                                     MsgConfigSource msgConfigSource,TypeConversionService typeConversionService){
 
         return new DefaultFnBus(injector,fns,fnsList,functions,methodFnProviders,
-                fnProviderClasses,eventBus,msgConfigSource,fnInterceptionService);
+                fnProviderClasses,eventBus,msgConfigSource,fnInterceptionService,typeConversionService);
     }
 
 

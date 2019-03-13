@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system;
+package com.iomolecule.mongodb;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
-import lombok.experimental.NonFinal;
 
-/**
- * The Default implementation of {@link ParamDeclaration}
- */
 @Value
-public class DefaultParamDeclaration implements ParamDeclaration{
+public class MongoClientConfig {
 
-    private String key;
-    private Class type;
-    private boolean mandatory;
-    private Object defaultValue;
+    private String hostName;
+    private Integer port;
 
 
-    @Override
-    public boolean hasDefaultValue(){
-        return defaultValue != null;
+    @JsonCreator
+    public static MongoClientConfig createMongoClient(@JsonProperty("hostName") String hostname,
+                                                      @JsonProperty("port") Integer port){
+        return new MongoClientConfig(hostname,port);
     }
+
 }

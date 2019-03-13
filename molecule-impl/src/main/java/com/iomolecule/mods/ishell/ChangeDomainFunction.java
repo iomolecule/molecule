@@ -45,13 +45,11 @@ class ChangeDomainFunction implements Function<Param, Param> {
 
 
             if (param.containsKey(IN_PARAMS)) {
-                List<String> args = (List<String>) param.get(IN_PARAMS);
+                String destinationDomain = (String)param.get(IN_PARAMS);
 
-                if (args == null || args.isEmpty()) {
+                if (destinationDomain == null || destinationDomain.isEmpty()) {
                     System.out.println("Please specify the destination domain (or '/' for root)");
                 }
-
-                String destinationDomain = args.get(0);
 
                 if(destinationDomain.equals("/")){
                     domainStack.clear();

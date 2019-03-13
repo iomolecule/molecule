@@ -35,9 +35,24 @@ public interface ParamDeclaration {
      */
     public Class getType();
 
+
     /**
      * Declares whether the Parameter is mandatory or optional
      * @return Specifies whether the Parameter is mandatory or optional
      */
     public boolean isMandatory();
+
+
+    /**
+     * Retrieves the default value if present
+     * @return The default value specified
+     */
+    public Object getDefaultValue();
+
+
+    /**
+     * Declares whether the Parameter has a default value
+     * @return Boolean value indicating whether the value has a default or not
+     */
+    public boolean hasDefaultValue();
 }

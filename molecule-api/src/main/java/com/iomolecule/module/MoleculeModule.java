@@ -229,6 +229,17 @@ public abstract class MoleculeModule extends AbstractModule{
 
     }
 
+    protected void registerFnProviders(Class... fnProviderClasses){
+        Multibinder<Object> fnProviders = Multibinder.newSetBinder(binder(),Object.class,FnProvider.class);
+
+        if(fnProviderClasses != null && fnProviderClasses.length > 0) {
+            for (Class fnProviderClass : fnProviderClasses) {
+                fnProviders.addBinding().to(fnProviderClass).in(Singleton.class);
+            }
+        }
+
+    }
+
     protected List<Operation> getOperations(String fileInClasspath) throws Exception {
 
         try(InputStream inputStream = getClass().getResourceAsStream(fileInClasspath)){

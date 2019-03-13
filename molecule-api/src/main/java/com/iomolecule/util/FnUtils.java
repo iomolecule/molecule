@@ -176,7 +176,7 @@ public class FnUtils {
 
             if(params != null){
                 for (ParamDecl param : params) {
-                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory());
+                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null);
                     paramDeclarationList.add(paramDeclaration);
                 }
             }
@@ -197,7 +197,7 @@ public class FnUtils {
 
             if(params != null){
                 for (ParamDecl param : params) {
-                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory());
+                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null);
                     paramDeclarationList.add(paramDeclaration);
                 }
             }
@@ -233,6 +233,8 @@ public class FnUtils {
                     Object convertedValue = typeConversionService.convert(value,paramDeclaration.getType());
                     outParam = outParam.plus(paramDeclaration.getKey(),convertedValue);
                 }
+            }else if(paramDeclaration.hasDefaultValue()){
+                outParam = outParam.plus(paramDeclaration.getKey(),paramDeclaration.getDefaultValue());
             }else if(paramDeclaration.isMandatory()){
                 String message = String.format("Param %s is mandatory which is missing in the param map",paramDeclaration.getKey());
                 throw new RuntimeException(message);

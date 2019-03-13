@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.iomolecule.system;
+package com.iomolecule.mods.main;
 
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import com.iomolecule.system.TypeConverter;
 
-/**
- * The Default implementation of {@link ParamDeclaration}
- */
-@Value
-public class DefaultParamDeclaration implements ParamDeclaration{
-
-    private String key;
-    private Class type;
-    private boolean mandatory;
-    private Object defaultValue;
-
-
+class StringTypeConverter implements TypeConverter{
     @Override
-    public boolean hasDefaultValue(){
-        return defaultValue != null;
+    public Object convert(Object in) {
+
+        String value = null;
+
+        if(in != null){
+            if(in instanceof String){
+                value = (String) in;
+            }else{
+                value = in.toString();
+            }
+        }
+
+        return value;
     }
 }

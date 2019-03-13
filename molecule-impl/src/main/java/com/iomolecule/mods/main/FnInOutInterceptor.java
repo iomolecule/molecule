@@ -38,7 +38,7 @@ class FnInOutInterceptor implements FnInterceptor{
     @Override
     public Param before(Fn fn, Param input) {
         List<ParamDeclaration> inDeclarations = fn.getInDeclarations();
-        System.out.println("Before fn "+fn);
+        //System.out.println("Before fn "+fn);
         input = FnUtils.verifyInParams(input, inDeclarations);
         Param output = null;
         try {
@@ -56,8 +56,8 @@ class FnInOutInterceptor implements FnInterceptor{
 
         output = FnUtils.mapOutParams(output,outDeclarations, Constants.OUT_PARAMS);
 
-        System.out.println("After Fn "+fn);
-        System.out.println("Output "+output);
+        //System.out.println("After Fn "+fn);
+        //System.out.println("Output "+output);
 
         return output;
     }

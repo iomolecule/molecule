@@ -30,7 +30,7 @@ import java.util.function.Function;
 
 import static com.iomolecule.commons.Constants.IN_PARAMS;
 
-@Id("function://system/ishell/jline/aboutModuleFun")
+//@Id("function://system/ishell/jline/aboutModuleFun")
 class AboutModuleFunction implements Function<Param,Param> {
 
     private Set<ModuleInfo> allModules;
@@ -44,12 +44,10 @@ class AboutModuleFunction implements Function<Param,Param> {
     public Param apply(Param param) {
 
         if(param.containsKey(IN_PARAMS)){
-            List<String> args = (List<String>)param.get(IN_PARAMS);
-            if(args.isEmpty()){
+            String moduleName = (String)param.get(IN_PARAMS);
+            if(moduleName == null || moduleName.isEmpty()){
                 System.out.println("Please provide a valid module name to get information for!");
             }else{
-                String moduleName = args.get(0);
-
                 List<ModuleInfo> matchingModules = new ArrayList<>();
 
                 allModules.forEach(moduleInfo -> {
@@ -73,7 +71,7 @@ class AboutModuleFunction implements Function<Param,Param> {
         }else{
             System.out.println("Please provide a valid module name to get information for!");
         }
-        return null;
+        return param;
     }
 
     private void printAttributes(Map<String, Object> attributes) {

@@ -21,6 +21,7 @@ import com.google.inject.Injector;
 import com.iomolecule.system.*;
 import com.iomolecule.system.annotations.Id;
 import com.iomolecule.system.services.FnInterceptionService;
+import com.iomolecule.system.services.TypeConversionService;
 import com.iomolecule.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.iomolecule.commons.Constants;
@@ -61,10 +62,15 @@ class DefaultFnBus implements FnBus{
     private boolean started;
 
     private MsgConfigSource messageConfigProvider;
+    private TypeConversionService typeConversionService;
 
     private static List<ParamDeclaration> errorOutParamDeclaration = LIST(ParamDeclaration.class,
-            new DefaultParamDeclaration(STATUS,String.class,true),
-            new DefaultParamDeclaration(REASON,String.class,true));
+            new DefaultParamDeclaration(STATUS,String.class,true,null),
+            new DefaultParamDeclaration(REASON,String.class,true,null));
+
+    private static List<ParamDeclaration> exceptionOutParamDeclaration = LIST(ParamDeclaration.class,
+            new DefaultParamDeclaration(STATUS,String.class,true,null),
+            new DefaultParamDeclaration(REASON,String.class,true,null));
 
 
     private FnInterceptionService fnInterceptionService;
@@ -115,7 +121,8 @@ class DefaultFnBus implements FnBus{
                  Set<Object> methodFnProviders,
                  Set<Object> fnProviderClasses,
                  EventBus eventBus,
-                 MsgConfigSource messageConfigProvider, FnInterceptionService fnInterceptionService){
+                 MsgConfigSource messageConfigProvider, FnInterceptionService fnInterceptionService,
+                 TypeConversionService typeConversionService){
         checkArgument(fnSet != null,"Set of Fns cannot be null!");
         checkArgument(eventBus != null, "EventBus cannot be null!");
         this.fns = fnSet;
@@ -127,6 +134,7 @@ class DefaultFnBus implements FnBus{
         this.methodFnProviders = methodFnProviders;
         this.fnProviders = fnProviderClasses;
         this.injector = injector;
+        this.typeConversionService = typeConversionService;
         try {
             uri = new URI(String.format("%s://%s", FUNCTION_SCHEME, FNBUS_NAME));
         }catch(Exception e){
@@ -229,7 +237,7 @@ class DefaultFnBus implements FnBus{
                 //outParam = FnUtils.mapOutParams(outParam,fnToInvoke.getOutDeclarations(), Constants.OUT_PARAMS);
                 return outParam;
             }catch(Exception e){
-                e.printStackTrace();
+                //e.printStackTrace();
                 return handleException(e,param);
             }
         }else{
@@ -247,14 +255,19 @@ class DefaultFnBus implements FnBus{
 
     private Param handleException(Exception exception, Param param) {
         String message = exception.getMessage();
+        String messageJsonPointer = JSONUtils.toJSONPointer(message);
         try{
-            message = messageConfigProvider.get(message,String.class,message);
+            message = messageConfigProvider.get(messageJsonPointer,String.class,message);
         }catch(Exception ex){
+            //ex.printStackTrace();
             //if no mapped message is found just ignore and send the message in the exception
         }
         Param outParam = param.plus(STATUS,FAILED);
         outParam = outParam.plus(REASON,message);
         outParam = outParam.plus(EXCEPTION,exception);
+
+        outParam = FnUtils.mapOutParams(outParam, exceptionOutParamDeclaration, Constants.OUT_PARAMS);
+
         return outParam;
     }
 
@@ -363,7 +376,7 @@ class DefaultFnBus implements FnBus{
 
         Id idAnnotation = providerMethod.getAnnotation(Id.class);
 
-        List<ParamDeclaration> argumentsInfo = ReflectionUtils.getArgumentInfo(providerObject, providerMethod);
+        List<ParamDeclaration> argumentsInfo = ReflectionUtils.getArgumentInfo(providerObject, providerMethod,typeConversionService);
         ParamDeclaration returnInfo = ReflectionUtils.getReturnInfo(providerObject, providerMethod);
 
         MethodFn methodFn = new MethodFn(providerObject,providerMethod,idAnnotation.value(),argumentsInfo,returnInfo);
