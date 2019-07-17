@@ -27,6 +27,7 @@ import com.iomolecule.system.services.FnBus;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -44,18 +45,24 @@ class HttpHandler implements io.undertow.server.HttpHandler{
     private FnBus fnBus;
     private LifecycleManager rootLifecycleManager;
     private Set<String> supportedMediaTypes;
+    private com.iomolecule.util.PathTemplateMatcher pathTemplateMatcher;
 
 
     @Inject
-    HttpHandler(DomainService domainService, FnBus fnBus, LifecycleManager lifecycleManager, @SupportedMediaTypes Set<String> supportedMediaTypes){
+    HttpHandler(DomainService domainService,
+                com.iomolecule.util.PathTemplateMatcher pathTemplateMatcher,
+                FnBus fnBus, LifecycleManager lifecycleManager,
+                @SupportedMediaTypes Set<String> supportedMediaTypes){
         Objects.requireNonNull(domainService,"domainService");
         Objects.requireNonNull(fnBus,"fnBus");
         Objects.requireNonNull(lifecycleManager,"lifecyclemanager");
         Objects.requireNonNull(supportedMediaTypes,"supported media types");
+        Objects.requireNonNull(pathTemplateMatcher,"PathTemplateMatcher");
         this.domainService = domainService;
         this.fnBus = fnBus;
         this.rootLifecycleManager = lifecycleManager;
         this.supportedMediaTypes = supportedMediaTypes;
+        this.pathTemplateMatcher = pathTemplateMatcher;
     }
 
     @Override
@@ -80,8 +87,6 @@ class HttpHandler implements io.undertow.server.HttpHandler{
         if(isSupportedMediaTypes(httpServerExchange)){
 
             try {
-
-
                 Param inParam = mapRequestToParam(httpServerExchange);
                 Param outParam = fnBus.apply(inParam);
 
@@ -143,6 +148,10 @@ class HttpHandler implements io.undertow.server.HttpHandler{
 
         Operation operation = domainService.getOperation(operationPath);
 
+        //check if there are any template path parameters
+        Map<String, String> pathVariableMap =
+                pathTemplateMatcher.extractTemplateVariables(operationPath, operation.getName(), null);
+
         Param outParam = null;
 
         if(operation.getName().equals("__no_op__")){
@@ -153,9 +162,18 @@ class HttpHandler implements io.undertow.server.HttpHandler{
 
             if(requestMethod.equalToString("POST") || requestMethod.equalToString("PUT")){
                 requestBody = readBody(httpServerExchange);
-                Map map = OBJECT_MAPPER.readValue(requestBody, Map.class);
+                //log.info("Request Body for post method {}",requestBody);
+                Map map = null;
+                if(!StringUtils.isEmpty(requestBody)) {
+                    map = OBJECT_MAPPER.readValue(requestBody, Map.class);
+                }else{
+                    map = new HashMap();
+                }
                 requestMap.putAll(map);
             }
+
+            if(pathVariableMap.size() > 0)
+                requestMap = populatePathVariables(pathVariableMap,requestMap);
 
             requestMap = populateQueryParams(queryParameters,requestMap);
 
@@ -167,6 +185,13 @@ class HttpHandler implements io.undertow.server.HttpHandler{
 
 
         return outParam;
+    }
+
+    private Map populatePathVariables(Map<String, String> pathVariableMap, Map requestMap) {
+        pathVariableMap.forEach((k,v)->{
+            requestMap.put(k,v);
+        });
+        return requestMap;
     }
 
     private Map populateQueryParams(Map<String, Deque<String>> queryParameters, Map requestMap) {

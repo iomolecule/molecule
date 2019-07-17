@@ -16,10 +16,13 @@
 
 package com.iomolecule.mods.sqljdbi;
 
+import com.google.inject.Singleton;
+import com.google.inject.multibindings.ProvidesIntoSet;
 import com.iomolecule.mods.sqlbase.SQLBaseModule;
 import com.iomolecule.module.MoleculeModule;
 import com.iomolecule.sql.jdbi.services.SQLJDBIManagerService;
 import com.iomolecule.system.LifecycleManager;
+import com.iomolecule.system.annotations.MethodFnProvider;
 
 import java.util.AbstractMap;
 
@@ -40,4 +43,10 @@ public class SQLJDBIModule extends MoleculeModule {
         return tuple("sqljdbi-lifecyclemanager",SQLJDBILifecycleManager.class);
     }
 
+    @ProvidesIntoSet
+    @MethodFnProvider
+    @Singleton
+    public Object provideSQLJDBIFnProvider(SQLJDBIManagerService managerService){
+        return new SQLJDBIFnProvider(managerService);
+    }
 }

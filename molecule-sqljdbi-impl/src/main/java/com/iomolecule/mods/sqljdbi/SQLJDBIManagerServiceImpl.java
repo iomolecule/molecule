@@ -24,8 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 class SQLJDBIManagerServiceImpl implements SQLJDBIManagerService{
@@ -57,5 +56,20 @@ class SQLJDBIManagerServiceImpl implements SQLJDBIManagerService{
         log.debug("Stopping...");
 
         jdbiMap.clear();
+    }
+
+    @Override
+    public Iterator<String> getNames() {
+        Set<String> names = jdbiMap.keySet();
+        return names.iterator();
+    }
+
+    @Override
+    public Optional<Jdbi> getJdbiInstance(String name) {
+        Optional<Jdbi> jdbiOptional = Optional.empty();
+        if(jdbiMap.containsKey(name)){
+            jdbiOptional = Optional.ofNullable(jdbiMap.get(name));
+        }
+        return jdbiOptional;
     }
 }

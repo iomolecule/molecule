@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.iomolecule.sql.jdbi.services;
+package com.iomolecule.util;
 
-import org.jdbi.v3.core.Jdbi;
+import java.util.Map;
 
-import java.util.Iterator;
-import java.util.Optional;
+public interface PathTemplateMatcher {
 
-public interface SQLJDBIManagerService {
-
-    public void start();
-
-    public void stop();
-
-    public Iterator<String> getNames();
-
-    public Optional<Jdbi> getJdbiInstance(String name);
+    public Map<String,String> extractTemplateVariables(String path,String templatePath,
+                                                       Map<String,String> templateVariables);
 
 }

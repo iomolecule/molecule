@@ -14,21 +14,29 @@
  * limitations under the License.
  */
 
-package com.iomolecule.sql.jdbi.services;
+package com.iomolecule.util.ds;
 
-import org.jdbi.v3.core.Jdbi;
-
-import java.util.Iterator;
 import java.util.Optional;
 
-public interface SQLJDBIManagerService {
+public interface TreeNode<T> {
 
-    public void start();
+    public String getName();
 
-    public void stop();
+    public <T> T getData();
 
-    public Iterator<String> getNames();
+    public void setData(T data);
 
-    public Optional<Jdbi> getJdbiInstance(String name);
+    public boolean hasChildren();
 
+    public TreeNode<T>[] getChildren();
+
+    public boolean isValidChild(String path);
+
+    public TreeNode<T> getChildAtPath(String path) throws InvalidTreeNodePathException;
+
+    public <T> T getDataAtPath(String path) throws InvalidTreeNodePathException;
+
+    public void setDataAtPath(String path,T data) throws InvalidTreeNodePathException;
+
+    public Optional<TreeNode<T>> getChild(String name);
 }

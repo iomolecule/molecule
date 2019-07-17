@@ -19,6 +19,7 @@ package com.iomolecule.util;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.Map;
+import java.util.Optional;
 
 public final class StringUtils {
 
@@ -27,4 +28,46 @@ public final class StringUtils {
     public static String format(String formatText,Map<String,Object> map){
         return StringSubstitutor.replace(formatText,map);
     }
+
+    /**
+     * Separates a path with dots into 2 parts the first and the rest
+     * @param path
+     * @return
+     */
+    public static String[] splitPath(String path){
+        if(org.apache.commons.lang3.StringUtils.isEmpty(path)){
+            return new String[0];
+        }
+
+        int first = path.indexOf('.');
+
+        if(first >=0 ){
+            String firstPart = path.substring(0,first);
+            if(path.length() > (first+1)) {
+                String restPart = path.substring(first + 1, path.length());
+                return new String[]{firstPart,restPart};
+            }else{
+                return new String[]{firstPart};
+            }
+        }else{
+            return new String[]{path};
+        }
+    }
+
+    public static Optional<String> getTemplateVariable(String text, String start, String end){
+        String variableName = null;
+
+        if(!org.apache.commons.lang3.StringUtils.isEmpty(text)){
+
+            text = text.trim();
+
+            if(text.startsWith(start) && text.endsWith(end)){
+                variableName = text.substring(start.length());
+                variableName = variableName.substring(0,(variableName.length() - end.length()));
+            }
+        }
+
+        return Optional.ofNullable(variableName);
+    }
+
 }

@@ -28,4 +28,10 @@
     <artifactId>molecule-sqljdbi-api</artifactId>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-core</artifactId>
+        </dependency>
+    </dependencies>
 </project>

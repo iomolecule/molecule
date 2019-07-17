@@ -367,7 +367,8 @@ public class DefaultMainModule extends MoleculeModule{
     @Singleton
     public DomainService provideDomain(@DomainOperations Set<List<Operation>> operationsSet){
         log.debug("OperationsSet {}",operationsSet);
-        return new DefaultDomainService(operationsSet);
+        //return new DefaultDomainService(operationsSet);
+        return new DomainServiceImpl2(operationsSet);
     }
 
     @Provides
@@ -412,6 +413,11 @@ public class DefaultMainModule extends MoleculeModule{
         return new FnInOutInterceptor(typeConversionService);
     }
 
+    @Provides
+    @Singleton
+    public com.iomolecule.util.PathTemplateMatcher providePathTemplateMatcher(){
+        return new SimplePathTemplateMatcher();
+    }
 
 
 

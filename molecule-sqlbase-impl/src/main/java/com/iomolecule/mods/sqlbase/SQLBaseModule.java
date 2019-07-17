@@ -18,6 +18,7 @@ package com.iomolecule.mods.sqlbase;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Provides;
+import com.google.inject.multibindings.ProvidesIntoSet;
 import com.iomolecule.config.ConfigurationException;
 import com.iomolecule.config.ConfigurationSource;
 import com.iomolecule.module.MoleculeModule;
@@ -26,6 +27,7 @@ import com.iomolecule.sql.base.SQLDatasourceDefMap;
 import com.iomolecule.sql.base.services.SQLDatasourceManagerService;
 import com.iomolecule.system.LifecycleManager;
 import com.iomolecule.system.annotations.AsyncEventBus;
+import com.iomolecule.system.annotations.MethodFnProvider;
 
 import javax.inject.Singleton;
 import java.util.AbstractMap;
@@ -62,5 +64,11 @@ public class SQLBaseModule extends MoleculeModule {
         return new SQLDatasourceManagerServiceImpl(datasourceDefMap,sqlBaseConfig,eventBus);
     }
 
+    @ProvidesIntoSet
+    @MethodFnProvider
+    @Singleton
+    public Object provideSQLBaseFnProvider(SQLDatasourceManagerService managerService){
+        return new SQLBaseFnProvider(managerService);
+    }
 
 }
