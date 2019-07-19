@@ -58,6 +58,7 @@ public class DomainServiceImpl2 implements DomainService {
                     for (Operation operation : operations) {
                         try {
                             rootNode.setDataAtPath(operation.getName(),operation);
+
                         } catch (InvalidTreeNodePathException e) {
                             //e.printStackTrace();
                             log.warn("Invalid Tree Node path {}",e.getMessage());
@@ -65,6 +66,9 @@ public class DomainServiceImpl2 implements DomainService {
                         }
                     }
                 }
+
+                //finally freeze the nodes
+                rootNode.freeze();
             }
 
             started = true;
@@ -130,7 +134,9 @@ public class DomainServiceImpl2 implements DomainService {
 
             if(child.hasChildren()){
                 for (TreeNode<Operation> childChild : child.getChildren()) {
-                    children.add(childChild.getName());
+                    if(childChild.getData() == null) { //show only domains not operations
+                        children.add(childChild.getName());
+                    }
                 }
             }
         } catch (InvalidTreeNodePathException e) {
@@ -256,12 +262,65 @@ public class DomainServiceImpl2 implements DomainService {
     @Override
     public boolean isValidDomainAt(String path, String domain) {
         List<String> domainNamesAt = getDomainNamesAt(path);
-        return domainNamesAt.contains(domain);
+        List<String>[] sortedNames = getTemplateNames(domainNamesAt);
+
+        boolean nameMatched = false;
+        //first check the simple names
+        if(isValidDomainNameAt(domain,sortedNames[0])){
+            nameMatched = true;
+        }else{
+            nameMatched = (sortedNames[1].size() > 0) ? true : false;
+        }
+
+        return nameMatched;
     }
+
+    private boolean isValidDomainNameAt(String domain, List<String> sortedName) {
+        boolean retVal = false;
+        for (String name : sortedName) {
+            if(name.equalsIgnoreCase(domain)){
+                retVal = true;
+                break;
+            }
+        }
+
+        return retVal;
+    }
+
+    private List<String>[] getTemplateNames(List<String> domainNamesAt) {
+        List<String> templateNames = new ArrayList<>();
+        List<String> simpleNames = new ArrayList<>();
+        for (String domainName : domainNamesAt) {
+            Optional<String> templateVariable = com.iomolecule.util.StringUtils.getTemplateVariable(domainName,
+                    OperationNode.TEMPLATE_START, OperationNode.TEMPLATE_END);
+            if(templateVariable.isPresent()){
+                templateNames.add(templateVariable.get());
+            }else{
+                simpleNames.add(domainName);
+            }
+        }
+
+        return new List[]{simpleNames,templateNames};
+    }
+
+
 
     @Override
     public Map getDomainTree() {
         return getTreeNodeAsMap(rootNode);
+    }
+
+    @Override
+    public String getFullyQualifiedDomainPathAt(String actualPath) {
+        String retVal = null;
+        try {
+            TreeNode<Operation> childAtPath = rootNode.getChildAtPath(actualPath);
+            retVal = childAtPath.getFullyQualifiedName();
+        } catch (InvalidTreeNodePathException e) {
+            //e.printStackTrace();
+        }
+
+        return retVal;
     }
 
     private Map getTreeNodeAsMap(TreeNode<Operation> node) {

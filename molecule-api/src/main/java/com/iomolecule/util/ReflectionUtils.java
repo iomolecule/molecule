@@ -106,7 +106,7 @@ public class ReflectionUtils {
             }
         }
 
-        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,defaultVal);
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,defaultVal,null);
 
         return paramInfo;
     }
@@ -132,7 +132,7 @@ public class ReflectionUtils {
             mandatory = true;
         }
 
-        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,null);
+        ParamDeclaration paramInfo = new DefaultParamDeclaration(paramName,dataType,mandatory,null,null);
 
         return paramInfo;
     }

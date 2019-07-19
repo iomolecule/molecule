@@ -81,6 +81,11 @@ class CmdShell implements Shell, Runnable{
     }
 
     @Override
+    public void updateState() {
+
+    }
+
+    @Override
     public void stop() {
         log.debug("Stop ...");
     }

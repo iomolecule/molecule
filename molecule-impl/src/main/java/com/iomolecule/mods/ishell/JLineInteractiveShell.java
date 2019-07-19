@@ -19,6 +19,7 @@ package com.iomolecule.mods.ishell;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Splitter;
 import com.iomolecule.system.*;
+import com.iomolecule.util.PathTemplateMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.*;
@@ -49,7 +50,7 @@ class JLineInteractiveShell implements Shell {
     static String defaultPrompt = "> ";
     private Completer domainOpCompleter;
     //private String currentDomain = "";
-
+    private Map<String,String> stateVariables;
 
     private Stack<String> domainStack;
     //private EvictingQueue<String> commandHistory = EvictingQueue.create(50);
@@ -61,12 +62,14 @@ class JLineInteractiveShell implements Shell {
     private Splitter splitter = Splitter.on(pattern).trimResults().omitEmptyStrings();
     private FnBus fnBus;
     private LifecycleManager rootLifecycleManager;
+    private PathTemplateMatcher pathTemplateMatcher;
 
     @Inject
     JLineInteractiveShell(DomainService domainService,
                           FnBus fnBus,
                           @DomainStack Stack<String> domainStack,
-                          LifecycleManager rootLifecycleManager){
+                          LifecycleManager rootLifecycleManager,
+                          PathTemplateMatcher pathTemplateMatcher){
         commandsList = new String[]{"help","domains","ops","cd","pwd","exec","exit"};
         this.domainService = domainService;
         this.fnBus = fnBus;
@@ -74,6 +77,7 @@ class JLineInteractiveShell implements Shell {
         this.domainStack.push(ROOT_DOMAIN);
         this.domainOpCompleter = new DomainOperationsCompleter(domainService,domainStack);
         this.rootLifecycleManager = rootLifecycleManager;
+        this.pathTemplateMatcher = pathTemplateMatcher;
     }
 
     @Override
@@ -133,6 +137,18 @@ class JLineInteractiveShell implements Shell {
 
     }
 
+    @Override
+    public void updateState() {
+
+        //update the state variables
+        String fullyQualifiedDomain = getFullyQualifiedDomain(this.domainStack);
+        String fullyQualifiedDomainDefinition = domainService.getFullyQualifiedDomainPathAt(fullyQualifiedDomain);
+        log.debug("domain name : {}",fullyQualifiedDomain);
+        log.debug("domain template name : {}",fullyQualifiedDomainDefinition);
+        stateVariables = this.pathTemplateMatcher.extractTemplateVariables(fullyQualifiedDomain, fullyQualifiedDomainDefinition, null);
+        log.debug("updateState() , state variables {}",stateVariables);
+    }
+
     private List<String> doSplit(String line) {
         String[] splitOut = line.split(" ", 2);
         List<String> splitOutput = new ArrayList<>();
@@ -169,6 +185,7 @@ class JLineInteractiveShell implements Shell {
             //log.debug("Operation {}",operation);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
+            inParam = fillStateVariables(inParam,stateVariables);
             inParam = fillParams(inParam,args);
             //log.debug("In Params {}",inParam);
             Param outParam = fnBus.apply(inParam);
@@ -179,6 +196,21 @@ class JLineInteractiveShell implements Shell {
             throw new InvalidOperationException(String.format("Operation %s is invalid for domain %s",command,fullyQualifiedCurrentDomain));
         }
     }
+
+    private Param fillStateVariables(Param inParam, Map<String, String> stateVariables) {
+        log.debug("State Variables {}",stateVariables);
+        Param outParam = inParam;
+        if(stateVariables != null && !stateVariables.isEmpty()){
+            Set<String> keys = stateVariables.keySet();
+
+            for (String key : keys) {
+                outParam = outParam.plus(key,stateVariables.get(key));
+            }
+
+        }
+        return outParam;
+    }
+
 
     private Param fillParams(Param inParam, List<String> args) {
         if(args == null || args.isEmpty()){
@@ -229,6 +261,7 @@ class JLineInteractiveShell implements Shell {
             Operation operation = domainService.getOperation(command);
             Param inParam = new InOutParam();
             inParam = inParam.plus(Constants.FUNCTION_TO_INVOKE, operation.getFunctionURI());
+            inParam = fillStateVariables(inParam,stateVariables);
             inParam = fillParams(inParam,args);
             Param outParam = fnBus.apply(inParam);
             if(outParam.containsKey(IShellConstants.EXIT_SYSTEM)){

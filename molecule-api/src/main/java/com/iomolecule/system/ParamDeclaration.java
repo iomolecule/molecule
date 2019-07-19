@@ -16,6 +16,8 @@
 
 package com.iomolecule.system;
 
+import java.lang.annotation.Annotation;
+
 /**
  * The ParamDeclaration represents the Declaration of a Param. Whether input or ouput.
  * The ParamDeclaration abstraction is used by the Fn instance to declare its input and output parameters
@@ -35,6 +37,12 @@ public interface ParamDeclaration {
      */
     public Class getType();
 
+
+    /**
+     * The Parameter category annotation
+     * @return
+     */
+    public Class<Annotation> getCategory();
 
     /**
      * Declares whether the Parameter is mandatory or optional

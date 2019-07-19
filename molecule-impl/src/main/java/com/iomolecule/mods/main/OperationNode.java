@@ -30,9 +30,14 @@ import java.util.Optional;
 class OperationNode implements TreeNode<Operation> {
 
     private String name;
+    private String fullyQualifiedName;
     private Operation data;
     private List<OperationNode> children = new ArrayList<>();
     private boolean templateName = false;
+    private TreeNode<Operation> parentNode;
+    private boolean frozen = false;
+
+
     public static final String TEMPLATE_START = "[";
     public static final String TEMPLATE_END = "]";
 
@@ -61,6 +66,11 @@ class OperationNode implements TreeNode<Operation> {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFullyQualifiedName() {
+        return fullyQualifiedName;
     }
 
     @Override
@@ -172,6 +182,10 @@ class OperationNode implements TreeNode<Operation> {
         }
 
         if(newChild){
+
+            //update the parent to the child node
+            childNode.setParentNode(this);
+
             //add the child to the list of children
             this.children.add(childNode);
         }
@@ -197,6 +211,48 @@ class OperationNode implements TreeNode<Operation> {
         }
 
         return optionalChild;
+    }
+
+    @Override
+    public void setParentNode(TreeNode<Operation> parentNode) {
+        this.parentNode = parentNode;
+    }
+
+    @Override
+    public void freeze() {
+
+        this.fullyQualifiedName = formFullyQualifiedName();
+
+        for (OperationNode child : children) {
+            child.freeze();
+        }
+
+        //finally freeze this node once the child is frozen
+        this.frozen = true;
+    }
+
+    @Override
+    public boolean isRootNode() {
+        return parentNode == null;
+    }
+
+    private String formFullyQualifiedName() {
+        String fullName = null;
+        if(parentNode != null){
+            if(parentNode.isRootNode()){
+                fullName = this.name;
+            }else {
+                fullName = String.format("%s.%s", parentNode.getFullyQualifiedName(), this.name);
+            }
+        }else{
+            fullName = name;
+        }
+        return fullName;
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return frozen;
     }
 
     @Override

@@ -22,6 +22,8 @@ public interface TreeNode<T> {
 
     public String getName();
 
+    public String getFullyQualifiedName();
+
     public <T> T getData();
 
     public void setData(T data);
@@ -39,4 +41,12 @@ public interface TreeNode<T> {
     public void setDataAtPath(String path,T data) throws InvalidTreeNodePathException;
 
     public Optional<TreeNode<T>> getChild(String name);
+
+    public void setParentNode(TreeNode<T> parentNode);
+
+    public void freeze();
+
+    public boolean isRootNode();
+
+    public boolean isFrozen();
 }

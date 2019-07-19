@@ -215,6 +215,11 @@ class DefaultDomainService implements DomainService {
         return getTreeAsMap(domainTree);
     }
 
+    @Override
+    public String getFullyQualifiedDomainPathAt(String actualPath) {
+        throw new RuntimeException(String.format("getFullyQualifiedDomainPathAt method has not been implemented!"));
+    }
+
     private Map getTreeAsMap(Tree tree){
 
         Map mapTree = new HashMap();

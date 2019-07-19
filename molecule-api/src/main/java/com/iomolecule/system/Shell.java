@@ -31,6 +31,8 @@ public interface Shell {
     public void start(String[] args);
 
 
+    public void updateState();
+
     /**
      * The call back invoked when the Shell is to be stopped.
      */

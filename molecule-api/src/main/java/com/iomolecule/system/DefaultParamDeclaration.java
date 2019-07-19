@@ -19,6 +19,8 @@ package com.iomolecule.system;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
+import java.lang.annotation.Annotation;
+
 /**
  * The Default implementation of {@link ParamDeclaration}
  */
@@ -29,7 +31,13 @@ public class DefaultParamDeclaration implements ParamDeclaration{
     private Class type;
     private boolean mandatory;
     private Object defaultValue;
+    private Class<Annotation> category;
 
+
+    @Override
+    public Class<Annotation> getCategory() {
+        return category;
+    }
 
     @Override
     public boolean hasDefaultValue(){

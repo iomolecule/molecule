@@ -176,7 +176,7 @@ public class FnUtils {
 
             if(params != null){
                 for (ParamDecl param : params) {
-                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null);
+                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null,null);
                     paramDeclarationList.add(paramDeclaration);
                 }
             }
@@ -197,7 +197,7 @@ public class FnUtils {
 
             if(params != null){
                 for (ParamDecl param : params) {
-                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null);
+                    ParamDeclaration paramDeclaration = new DefaultParamDeclaration(param.key(),param.type(),param.mandatory(),null,null);
                     paramDeclarationList.add(paramDeclaration);
                 }
             }

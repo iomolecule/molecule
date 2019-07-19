@@ -65,12 +65,12 @@ class DefaultFnBus implements FnBus{
     private TypeConversionService typeConversionService;
 
     private static List<ParamDeclaration> errorOutParamDeclaration = LIST(ParamDeclaration.class,
-            new DefaultParamDeclaration(STATUS,String.class,true,null),
-            new DefaultParamDeclaration(REASON,String.class,true,null));
+            new DefaultParamDeclaration(STATUS,String.class,true,null,null),
+            new DefaultParamDeclaration(REASON,String.class,true,null,null));
 
     private static List<ParamDeclaration> exceptionOutParamDeclaration = LIST(ParamDeclaration.class,
-            new DefaultParamDeclaration(STATUS,String.class,true,null),
-            new DefaultParamDeclaration(REASON,String.class,true,null));
+            new DefaultParamDeclaration(STATUS,String.class,true,null,null),
+            new DefaultParamDeclaration(REASON,String.class,true,null,null));
 
 
     private FnInterceptionService fnInterceptionService;

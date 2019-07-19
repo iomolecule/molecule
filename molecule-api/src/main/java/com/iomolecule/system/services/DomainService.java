@@ -120,4 +120,12 @@ public interface DomainService {
      * @return Map of domain tree
      */
     public Map getDomainTree();
+
+    /**
+     * Retrieves the matching fully qualified domain path as per the domain definition
+     * with template data
+     * @param actualPath
+     * @return
+     */
+    public String getFullyQualifiedDomainPathAt(String actualPath);
 }

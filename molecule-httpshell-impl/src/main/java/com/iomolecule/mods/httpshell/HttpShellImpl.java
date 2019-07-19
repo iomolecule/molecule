@@ -54,6 +54,11 @@ class HttpShellImpl implements Shell{
     }
 
     @Override
+    public void updateState() {
+
+    }
+
+    @Override
     public void stop() {
         log.debug("Stopping...");
 

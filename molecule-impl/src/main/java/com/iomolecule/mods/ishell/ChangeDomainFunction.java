@@ -18,10 +18,12 @@ package com.iomolecule.mods.ishell;
 
 import com.iomolecule.ishell.annotations.DomainStack;
 import com.iomolecule.system.Param;
+import com.iomolecule.system.Shell;
 import com.iomolecule.system.annotations.Id;
 import com.iomolecule.system.services.DomainService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
@@ -33,11 +35,15 @@ class ChangeDomainFunction implements Function<Param, Param> {
 
     private Stack<String> domainStack;
     private DomainService domainService;
+    private Shell interactiveShell;
 
     @Inject
-    public ChangeDomainFunction(DomainService domainService, @DomainStack Stack<String> domainStack) {
+    public ChangeDomainFunction(DomainService domainService,
+                                @DomainStack Stack<String> domainStack,
+                                @Named("shell://interactive/jline") Shell jLineInteractiveShell) {
         this.domainStack = domainStack;
         this.domainService = domainService;
+        this.interactiveShell = jLineInteractiveShell;
     }
 
     @Override
@@ -54,9 +60,13 @@ class ChangeDomainFunction implements Function<Param, Param> {
                 if(destinationDomain.equals("/")){
                     domainStack.clear();
                     domainStack.push(JLineInteractiveShell.ROOT_DOMAIN);
+                    interactiveShell.updateState();
+
                 }else if(destinationDomain.equals("..")){
                     if(domainStack.size()>1){
                         domainStack.pop(); //navigate to previous domain till root domain, beyond which it is invalid
+                        interactiveShell.updateState();
+
                     }
                 }else{
                     String fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
@@ -66,8 +76,8 @@ class ChangeDomainFunction implements Function<Param, Param> {
 
                         domainStack.push(destinationDomain);
 
-
-                        fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
+                        interactiveShell.updateState();
+                        //fullyQualifiedDomain = JLineInteractiveShell.getFullyQualifiedDomain(domainStack);
 
                     } else {
                         System.out.println(String.format("Domain %s is not a valid domain under %s", destinationDomain, fullyQualifiedDomainPath));
