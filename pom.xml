@@ -37,7 +37,7 @@
     </modules>
 
     <properties>
-        <undertow.version>2.0.19.Final</undertow.version>
+        <undertow.version>2.0.23.Final</undertow.version>
         <cfg4j.version>4.4.1</cfg4j.version>
         <lombok.version>1.18.8</lombok.version>
     </properties>
